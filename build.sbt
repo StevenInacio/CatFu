@@ -1,8 +1,7 @@
-name          := "htwg-scala-seed"
+name          := "CatFu"
 organization  := "de.htwg.se"
 version       := "0.0.1"
 scalaVersion  := "2.11.8"
-scalaVersion in ThisBuild := "2.11.8"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
 resolvers += Resolver.jcenterRepo
