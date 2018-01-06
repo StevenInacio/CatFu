@@ -1,10 +1,7 @@
 package de.htwg.se.CatFu.model
 
-import scala.util.Random
-
-trait Player extends Thing {
+abstract case class Player() extends Thing {
   val name: String
-
   var currentXP = 0
   var lvl = 1
   var currentHP: Int
@@ -18,13 +15,11 @@ trait Player extends Thing {
       val result: Int = currentHP - getHP
       currentHP = getHP
       result
-    }
-    else if (currentHP - dmg < 0) {
+    } else if (currentHP - dmg < 0) {
       val result = currentHP
       currentHP = 0
       result
-    }
-    else {
+    } else {
       currentHP -= dmg
       dmg
     }
@@ -33,16 +28,16 @@ trait Player extends Thing {
   def attack(target: Player): Int = {
     if (target.currentHP == 0) {
       -1
-    }
-    else {
+    } else {
       val random = new scala.util.Random
-      val att = this.getAtt
-      val defense = target.getDef
       // scalastyle:off magic.number
-      // these really are magic numbers, that are used only once.
       var dmg = 0
-      if ((att / defense) * 10 + 70 > random.nextInt(100)) {
-        dmg = target.damage(random.nextInt(att-lvl) + lvl)
+      if (hitrate(target) > random.nextInt(100)) {
+        dmg = target.damage(random.nextInt(this.getAtt - lvl) + lvl)
+        target.currentHP match {
+          case 0 => this.increaseXP((target.lvl / 2) * 5)
+          case _ => this.increaseXP(target.lvl / 2)
+        }
       }
       dmg
       // scalastyle:on magic.number
@@ -55,8 +50,17 @@ trait Player extends Thing {
       this.setLvl(lvl + 1)
     }
   }
+  def hitrate(target: Player): Int = {
+    // scalastyle:off magic.number
+    (100.0 - ((target.getDef.toDouble / this.getAtt.toDouble) * 10.0)).toInt match {
+      case x if x >= 100 => 100
+      case x if x < 0 => 0
+      case x => x
+    }
+    // scalastyle:on magic.number
+  }
   def xpToLvlUp: Int = {
-    10 + 5 * lvl^2
+    10 + 5 * lvl ^ 2
   }
   def fullDescription: String = {
     var s: String = toString + "\n"
@@ -70,7 +74,7 @@ trait Player extends Thing {
   }
 }
 
-class Mage(val name: String) extends Player{
+class Mage(val name: String) extends Player() {
   override val display: Char = 'F'
   val base_hp: Int = 8
   val base_att: Int = 0
@@ -88,16 +92,16 @@ class Mage(val name: String) extends Player{
     att = base_att + 3 * lvl
     defense = base_def + 2 * lvl
     // scalastyle:off magic.number
-    if (level < 10) {
-      range = 3
-      speed = 3
-    } else if (level < 20) {
-      range = 4
-      speed = 4
-    }
-    else {
-      range = 5
-      speed = 4
+    level match {
+      case x if x < 10 =>
+        range = 3
+        speed = 3
+      case x if x < 20 =>
+        range = 4
+        speed = 4
+      case _ =>
+        range = 5
+        speed = 4
     }
     // scalastyle:on magic.number
     currentHP = hp
@@ -108,10 +112,10 @@ class Mage(val name: String) extends Player{
   def getDef: Int = defense
   def getRange: Int = range
   def getSpeed: Int = speed
-  override def toString: String = name + ", the level " + lvl +  " Fleazard"
+  override def toString: String = name + ", the level " + lvl + " Fleazard"
 }
 
-class Warrior(val name: String) extends Player {
+class Warrior(val name: String) extends Player() {
   override val display: Char = 'P'
   val base_hp: Int = 9
   val base_att: Int = 0
@@ -120,7 +124,7 @@ class Warrior(val name: String) extends Player {
   private var att = base_att + 2
   private var defense = base_def + 4
   override var currentHP: Int = hp
-  private var speed = 4
+  private var speed = 4 // scalastyle:ignore
 
   def setLvl(level: Int): Unit = {
     lvl = level
@@ -128,16 +132,11 @@ class Warrior(val name: String) extends Player {
     att = base_att + 2 * lvl
     defense = base_def + 4 * lvl
     // scalastyle:off magic.number
-    if (level < 10) {
-      speed = 4
-    } else if (level < 15) {
-      speed = 5
-    }
-    else if (level < 20) {
-      speed = 6
-    }
-    else {
-      speed = 7
+    level match {
+      case x if x < 10 => speed = 4
+      case x if x < 15 => speed = 5
+      case x if x < 20 => speed = 6
+      case _ => speed = 7
     }
     // scalastyle:on magic.number
     currentHP = hp
@@ -148,5 +147,5 @@ class Warrior(val name: String) extends Player {
   def getDef: Int = defense
   def getRange: Int = 1
   def getSpeed: Int = speed
-  override def toString: String = name + ", the level " + lvl +  " Pawrior"
+  override def toString: String = name + ", the level " + lvl + " Pawrior"
 }

@@ -1,5 +1,5 @@
 package de.htwg.se.CatFu.model
 
-trait Thing {
+abstract class Thing() {
   val display: Char
 }
