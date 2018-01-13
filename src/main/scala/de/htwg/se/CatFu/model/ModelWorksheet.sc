@@ -15,8 +15,11 @@ field1.cells(0).y
 
 
 class Field {
+  var anzahlzeichenderEingabe = 0
   var x: Int = 4
   var y: Int = 4
+  var xE = 3
+  var yE = 1
   val field = Array.ofDim[Char](x, y)
 
   def clearField(): Unit = {
@@ -91,8 +94,9 @@ class Field {
 
 
 
-
+//prüft, ob die Eingabe gültig war vong String her
 def move2(eingabe : String): Boolean = {
+  anzahlzeichenderEingabe = 0
   //if(eingabe.length == getSpeed)
   var gelungen = true
   import scala.collection.mutable.ListBuffer
@@ -101,12 +105,14 @@ def move2(eingabe : String): Boolean = {
     if(!matchTest(eingabe.charAt(i))) {// teste gültigkeit
       return false
     }else{
+      anzahlzeichenderEingabe += 1
       input += eingabe.charAt(i)
     }
     println(input)
   }
   val inputList = input.toList
   println(inputList)
+  println("Eingelesene Zeichen  :"+anzahlzeichenderEingabe)
 gelungen
 }
 
@@ -118,7 +124,6 @@ gelungen
     case _ => false
   }
 
-
 def move1(eingabe : String): Unit ={
   if(!move2(eingabe)){
     println("Du bist nicht du, wenn du hungrig bist. Falsche Eingabe")
@@ -126,40 +131,115 @@ def move1(eingabe : String): Unit ={
 }
 
 
-
-
-  /*
-  def move3(eingabe : String): Boolean = {
-      var xE = 3
-      var yE = 1
-    field(xE)(yE) = 'O'
-    var done = true
-    println("hmmmmmmmmmm")
-    if(move2(eingabe)==false){
-      println("hmmmmmmmmmmllllllll")
-      return false
-    }else{
-      println("hmpppmm" +eingabe.charAt(0))
-      var bla = letter(eingabe.charAt(0))
-
-      println("hmmmmmmmmpppmm"+bla+ eingabe.charAt(0))
+  def vorunsfrei(zeichen: Char): Boolean = {
+    var zeichenvoruns = letter(zeichen)
+    if (zeichenvoruns != ' ') {
+      println("Halt, vor uns liegt :" + zeichenvoruns)
+      false
+    } else {
+      println("Test vor uns liegt :" + zeichenvoruns)
+      true
     }
-    done
   }
 
+  def nochImFeld(zeichen: Char): Boolean ={
 
+      if (zeichen == 'a') {
+        if (yE - 1 < y && yE - 1 >= 0) {
+         return true
+        }
+      }
+      if (zeichen == 'w') {
+        if (xE-1 < x && xE-1 >= 0) {
+          return true
+        }
+      }
+      if (zeichen == 's') {
+        if (yE+1 < y && yE+1 >= 0) {
+          return true
+        }
+      }
+      if (zeichen == 'd') {
+        if (xE+1 < x && xE+1 >= 0) {
+          return true
+        }
+      }
 
-  def letter(q: Char): Array= q match {
-    case 'a' => field(xE)(yE-1)
-    case 'w' => field(xE-1)(yE)
-    case 'd' => field(xE+1)(yE)
-    case 's' => field(xE)(yE+1)
-    case _ => 'e'
+    false
   }
-*/
+
+  def verandern(){}
+
+// verknüpfen mit move2 weil das eine liste erstellt
+  def realmove(eingabe: String): Int = { // unbedingt clear zuerst
+    var person = 'O'
+    field(xE)(yE) = person
+    println("lets start")
+    if (!move2(eingabe)) {
+      println("falsche eingabe")
+      return 1
+    } else {
+      var i = 0
+      println("Eingabe richtig")
+
+
+          for (i <- 0 until anzahlzeichenderEingabe) {
+            var zeichen = eingabe.charAt(i)
+            if(!nochImFeld(zeichen)){return 2}
+            if(!vorunsfrei(zeichen)){
+            return 3
+          }
+
+
+            if (zeichen == 'a') {
+              field(xE)(yE - 1) = person
+              field(xE)(yE) = ' '
+              yE -= 1
+              println("a")
+            }
+            if (zeichen == 'w') {
+              field(xE - 1)(yE) = person
+              field(xE)(yE) = ' '
+              xE -= 1
+              println("w")
+            }
+            if (zeichen == 's') {
+              field(xE)(yE + 1) = person
+              field(xE)(yE) = ' '
+              yE += 1
+              println("s")
+            }
+            if (zeichen == 'd') {
+              field(xE + 1)(yE) = person
+              field(xE)(yE) = ' '
+              xE += 1
+              println("d")
+            }
+
+            println(i + "ja" + anzahlzeichenderEingabe)
+
+
+          }
+        }
+        println("funktioniert")
+        42
+      }
+
+
+//Keine Wiederholungen und deswegen das match erweitern
+
+   def letter(q: Char): Char= q match {
+     case 'a' => field(xE)(yE-1)
+     case 'w' => field(xE - 1)(yE);
+     case 'd' => field(xE+1)(yE)
+     case 's' => field(xE)(yE+1)
+     case _ => 'e'
+   }
+
 }
 
 val f = new Field
-//f.move3("s")
-println(f)
-
+f.clearField()
+f.fillrandomField()
+f.realmove("wad")
+  println(f)
