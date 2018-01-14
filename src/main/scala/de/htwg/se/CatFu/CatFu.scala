@@ -73,16 +73,16 @@ object CatFu {
 
   def start(): Unit = {
     // Player management up to 4 ()
-      // Load Players
-      // Create Players
-      // remove Players
+    // Load Players
+    // Create Players
+    // remove Players
     // Start Game
-      // Generate 3-4 Random Enemies split playergroup total level among them
+    // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
-      // spawn it in
-      // set Obstacles
-      // set Enemies to random upper locations
-      // let Players decide where to place their pawns?
+    // spawn it in
+    // set Obstacles
+    // set Enemies to random upper locations
+    // let Players decide where to place their pawns?
     // show Board and Controls on Screen
     // randomize which turn it is
     // start appropriate turn
@@ -91,21 +91,21 @@ object CatFu {
   def playerTurn(): Unit = {
     // map Actor to (bool, bool) ("available" and "movable")
     // for (_ <- 0 until actorlist.length) {
-      // Show Options to Select available Actor or End Turn
-        // Handle Input
-        // if End Turn enemyTurn()
-        // else Show Actor Action Menu
-          // Handle Input
-          // move (grey out if movable == false)
-          // attack
-            // legality check
-            // pass:
-              // attack(field(x)(y): Player)
-            // failed:
-              // return to previous menu
-            // after that set available to false
-          // wait (immediately set available to false and continue)
-          // cancel to previous menu
+    // Show Options to Select available Actor or End Turn
+    // Handle Input
+    // if End Turn enemyTurn()
+    // else Show Actor Action Menu
+    // Handle Input
+    // move (grey out if movable == false)
+    // attack
+    // legality check
+    // pass:
+    // attack(field(x)(y): Player)
+    // failed:
+    // return to previous menu
+    // after that set available to false
+    // wait (immediately set available to false and continue)
+    // cancel to previous menu
     // End Turn
   }
 
@@ -124,7 +124,7 @@ object CatFu {
     println("To attack, you need to navigate your cats on the field to reach the Opurrnents with your attacks.")
     println()
     println("CLASSES\n==============================")
-    println(Console.YELLOW +"Pawriors" + Console.RESET + " use their claws as their favourite weapons, so they naturally have a range of only 1.")
+    println(Console.YELLOW + "Pawriors" + Console.RESET + " use their claws as their favourite weapons, so they naturally have a range of only 1.")
     println(Console.CYAN + "Fleazards" + Console.RESET + " have magical staffs. They can chant Spells of epical Purrportions, to reach far away enemies.")
     println()
     println("You lost when all your kittens are defeated. Hopefully they haven't used up all their 9 lives.")
@@ -133,3 +133,4 @@ object CatFu {
     print("\u001b[H\u001b[J")
   }
 }
+

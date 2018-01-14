@@ -13,11 +13,11 @@ abstract case class Player() extends Thing {
   def getSpeed: Int
 
   /**
-    * Decrease this characters current HP. <br>
-    * It ensures that the current HP is always between 0 and the max HP of this character.
-    * @param dmg the damage that needs to be dealt to this character
-    * @return the actual damage this character got.
-    */
+   * Decrease this characters current HP. <br>
+   * It ensures that the current HP is always between 0 and the max HP of this character.
+   * @param dmg the damage that needs to be dealt to this character
+   * @return the actual damage this character got.
+   */
   def damage(dmg: Int): Int = {
     if (currentHP - dmg > getMaxHP) {
       val result: Int = currentHP - getMaxHP
@@ -34,27 +34,27 @@ abstract case class Player() extends Thing {
   }
 
   /**
-    * Increases the characters current HP
-    * For this it uses the damage method with a negative value.
-    * @param amount how much the character should be healed.
-    * @return The actual hp healed.
-    */
+   * Increases the characters current HP
+   * For this it uses the damage method with a negative value.
+   * @param amount how much the character should be healed.
+   * @return The actual hp healed.
+   */
   def heal(amount: Int): Int = {
     -damage(-amount) // negative damage returns a negative result which needs to be negated again to get a positive return
   }
 
   /**
-    * Sets the character to the level and calculate the stat increase.
-    * The actual stat increase is role dependent so it's only abstract.
-    * @param level the level the character should be.
-    */
+   * Sets the character to the level and calculate the stat increase.
+   * The actual stat increase is role dependent so it's only abstract.
+   * @param level the level the character should be.
+   */
   def setLvl(level: Int)
 
   /**
-    * Calculates a hit or miss and damages the enemy player accordingly.
-    * @param target The character you want to attack.
-    * @return The damage you did, 0 if you missed or -1 if the enemy character is already dead.
-    */
+   * Calculates a hit or miss and damages the enemy player accordingly.
+   * @param target The character you want to attack.
+   * @return The damage you did, 0 if you missed or -1 if the enemy character is already dead.
+   */
   def attack(target: Player): Int = {
     if (target.currentHP == 0) {
       -1
@@ -75,11 +75,11 @@ abstract case class Player() extends Thing {
   }
 
   /**
-    * Increase the characters XP and levels it up, if the xp limit is reached.
-    * The character can level up more than once, if the xp limit is reached multiple times.
-    * @param xp The XP the character gets.
-    * @return True, if the character leveled up in the process.
-    */
+   * Increase the characters XP and levels it up, if the xp limit is reached.
+   * The character can level up more than once, if the xp limit is reached multiple times.
+   * @param xp The XP the character gets.
+   * @return True, if the character leveled up in the process.
+   */
   def increaseXP(xp: Int): Boolean = {
     currentXP += xp
     var result = false
@@ -92,10 +92,10 @@ abstract case class Player() extends Thing {
   }
 
   /**
-    * Calculate the hitrate of this character to hit the target character.
-    * @param target The enemy player, this character wants to hit.
-    * @return The hitrate between 0 and 100 (percent)
-    */
+   * Calculate the hitrate of this character to hit the target character.
+   * @param target The enemy player, this character wants to hit.
+   * @return The hitrate between 0 and 100 (percent)
+   */
   def hitrate(target: Player): Int = {
     // scalastyle:off magic.number
     (100.0 - ((target.getDef.toDouble / this.getAtt.toDouble) * 10.0)).toInt match {
@@ -107,17 +107,17 @@ abstract case class Player() extends Thing {
   }
 
   /**
-    * Calculates the XP to level up.
-    * @return XP to the next level
-    */
+   * Calculates the XP to level up.
+   * @return XP to the next level
+   */
   def xpToLvlUp: Int = {
     10 + 5 * lvl ^ 2
   }
 
   /**
-    * Shows all attributes of the character and gives back a String.
-    * @return A full description of the Character.
-    */
+   * Shows all attributes of the character and gives back a String.
+   * @return A full description of the Character.
+   */
   def fullDescription: String = {
     var s: String = toString + "\n"
     s += "XP: " + currentXP + "/" + xpToLvlUp + "\n"
