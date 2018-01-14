@@ -1,5 +1,5 @@
-htwg-scala-seed
-=========================
+# Software Engineering Project
+*****
 
 This is a seed project to create a basic scala project as used in the
 class Software Engineering at the University of Applied Science HTWG Konstanz
@@ -8,3 +8,9 @@ class Software Engineering at the University of Applied Science HTWG Konstanz
 * Has *ScalaTest* and *ScalaMock* at their latest versions as dependencies.
 * Has *sbt-scalariform*, *sbt-scapegoat*, *scalastyle-sbt-plugin* and *sbt-scoverage* sbt plugins
 * Has .gitignore defaults
+
+## About CatFu
+
+CatFu will be a simple Strategic Role-Playing Game (abreviated as SRPG or "Tactics"-Game)
+
+[![Build Status](https://travis-ci.org/StevenInacio/CatFu.svg?branch=master)](https://travis-ci.org/StevenInacio/CatFu)
