@@ -1,7 +1,6 @@
 package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.model._
-
 import scala.io.StdIn.readLine
 
 object CatFu {
@@ -62,21 +61,28 @@ object CatFu {
         case _ => println("What?")
       }
     }
+  }
 
+  def userPrint(msg: Any): Unit = {
+    if (msg.isInstanceOf[String]) {
+      println(msg)
+    } else {
+      println(msg.toString)
+    }
   }
 
   def start(): Unit = {
     // Player management up to 4 ()
-    // Load Players
-    // Create Players
-    // remove Players
+      // Load Players
+      // Create Players
+      // remove Players
     // Start Game
-    // Generate 3-4 Random Enemies split playergroup total level among them
+      // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
-    // spawn it in
-    // set Obstacles
-    // set Enemies to random upper locations
-    // let Players decide where to place their pawns?
+      // spawn it in
+      // set Obstacles
+      // set Enemies to random upper locations
+      // let Players decide where to place their pawns?
     // show Board and Controls on Screen
     // randomize which turn it is
     // start appropriate turn
@@ -85,26 +91,26 @@ object CatFu {
   def playerTurn(): Unit = {
     // map Actor to (bool, bool) ("available" and "movable")
     // for (_ <- 0 until actorlist.length) {
-    // Show Options to Select available Actor or End Turn
-    // Handle Input
-    // if End Turn enemyTurn()
-    // else Show Actor Action Menu
-    // Handle Input
-    // move (grey out if movable == false)
-    // attack
-    // legality check
-    // pass:
-    // attack(field(x)(y): Player)
-    // failed:
-    // return to previous menu
-    // after that set available to false
-    // wait (immediately set available to false and continue)
-    // cancel to previous menu
+      // Show Options to Select available Actor or End Turn
+        // Handle Input
+        // if End Turn enemyTurn()
+        // else Show Actor Action Menu
+          // Handle Input
+          // move (grey out if movable == false)
+          // attack
+            // legality check
+            // pass:
+              // attack(field(x)(y): Player)
+            // failed:
+              // return to previous menu
+            // after that set available to false
+          // wait (immediately set available to false and continue)
+          // cancel to previous menu
     // End Turn
   }
 
   def enemyTurn(): Unit = {
-
+    // see User Turn, but with AI
   }
 
   def help(): Unit = {
