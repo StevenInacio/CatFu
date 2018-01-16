@@ -1,8 +1,11 @@
 class Field {
-  var anzahlzeichenderEingabe = 0
+  var inputlength = 0
+  var person = 'O'
   var x: Int = 4
   var y: Int = 4
-  var xE = 3
+  var xold = 3
+  var yold = 1
+  var xE = 3  //current position
   var yE = 1
   val field = Array.ofDim[Char](x, y)
 
@@ -53,45 +56,48 @@ class Field {
   }
 
 
-
   //prüft, ob die Eingabe gültig war vong String her
-  def prueftGueltigkeit(eingabe : String): Boolean = {
-    anzahlzeichenderEingabe = 0
-    //if(eingabe.length == getSpeed)
-    var gelungen = true
+  def isvalid(userinput : String): Boolean = {
+    inputlength = 0
+    //if(eingabe.length <= getSpeed) geht
+    var wentwell = true
     import scala.collection.mutable.ListBuffer
     var input = new ListBuffer[Char]()
-    for (i <- 0 until eingabe.length) {
-      if(!matchTest(eingabe.charAt(i))) {// teste gültigkeit
+    for (i <- 0 until userinput.length) {
+      if(!matchTestValidInputSpace(userinput.charAt(i))) {// teste gültigkeit
+        println("falsche eingabe")
+        field(xE)(yE)=' '
+        field(xold)(yold) = person
         return false
       }else{
-        anzahlzeichenderEingabe += 1
-        input += eingabe.charAt(i)
+        println("Eingabe richtig")
+        inputlength += 1
+        input += userinput.charAt(i)
+        realmove(userinput.charAt(i))
       }
-      println(input)
     }
     val inputList = input.toList
     println(inputList)
-    println("Eingelesene Zeichen  :"+anzahlzeichenderEingabe)
-    gelungen
+    println("Eingelesene Zeichen  :"+inputlength)
+    wentwell
   }
 
-  def matchTest(q: Char): Boolean = q match {
-    case 'a' => true
-    case 'w' => true
-    case 'd' => true
-    case 's' => true
+  def matchTestValidInputSpace(q: Char): Boolean = q match {
+    case 'a' if yE - 1 < y && yE - 1 >= 0   => true
+    case 'w' if xE-1 < x && xE-1 >= 0       => true
+    case 'd' if xE+1 < x && xE+1 >= 0       => true
+    case 's' if yE+1 < y && yE+1 >= 0       => true
     case _ => false
   }
 
   def move1(eingabe : String): Unit ={
-    if(!move2(eingabe)){
+    if(!isvalid(eingabe)){
       println("Du bist nicht du, wenn du hungrig bist. Falsche Eingabe")
     }else{println("Purrrrfect")}
   }
 
 
-  def vorunsfrei(zeichen: Char): Boolean = {
+  def vorunsfrei(zeichen: Char): Boolean = {  //spike
     var zeichenvoruns = letter(zeichen)
     if (zeichenvoruns != ' ') {
       println("Halt, vor uns liegt :" + zeichenvoruns)
@@ -102,85 +108,40 @@ class Field {
     }
   }
 
-  def nochImFeld(zeichen: Char): Boolean ={
-
-    if (zeichen == 'a') {
-      if (yE - 1 < y && yE - 1 >= 0) {
-        return true
-      }
-    }
-    if (zeichen == 'w') {
-      if (xE-1 < x && xE-1 >= 0) {
-        return true
-      }
-    }
-    if (zeichen == 's') {
-      if (yE+1 < y && yE+1 >= 0) {
-        return true
-      }
-    }
-    if (zeichen == 'd') {
-      if (xE+1 < x && xE+1 >= 0) {
-        return true
-      }
-    }
-
-    false
-  }
-
-  def verandern(){}
-
   // verknüpfen mit move2 weil das eine liste erstellt
-  def realmove(eingabe: String): Int = { // unbedingt clear zuerst
-    var person = 'O'
+  def realmove(input: Char): Int = { // unbedingt clear zuerst
     field(xE)(yE) = person
     println("lets start")
-    if (!prueftGueltigkeit(eingabe)) {
-      println("falsche eingabe")
-      return 1
-    } else {
-      var i = 0
-      println("Eingabe richtig")
-
-
-      for (i <- 0 until anzahlzeichenderEingabe) {
-        var zeichen = eingabe.charAt(i)
-        if(!nochImFeld(zeichen)){return 2}
-        if(!vorunsfrei(zeichen)){
-          return 3
-        }
-
-
-        if (zeichen == 'a') {
-          field(xE)(yE - 1) = person
-          field(xE)(yE) = ' '
-          yE -= 1
-          println("a")
-        }
-        if (zeichen == 'w') {
-          field(xE - 1)(yE) = person
-          field(xE)(yE) = ' '
-          xE -= 1
-          println("w")
-        }
-        if (zeichen == 's') {
-          field(xE)(yE + 1) = person
-          field(xE)(yE) = ' '
-          yE += 1
-          println("s")
-        }
-        if (zeichen == 'd') {
-          field(xE + 1)(yE) = person
-          field(xE)(yE) = ' '
-          xE += 1
-          println("d")
-        }
-
-        println(i + "ja" + anzahlzeichenderEingabe)
-
-
-      }
+    if(!vorunsfrei(input)){
+      return 3
     }
+    if (input == 'a') {
+      field(xE)(yE - 1) = person
+      field(xE)(yE) = ' '
+      yE -= 1
+      println("a")
+    }
+    if (input == 'w') {
+      field(xE - 1)(yE) = person
+      field(xE)(yE) = ' '
+      xE -= 1
+      println("w")
+    }
+    if (input == 's') {
+      field(xE)(yE + 1) = person
+      field(xE)(yE) = ' '
+      yE += 1
+      println("s")
+    }
+    if (input == 'd') {
+      field(xE + 1)(yE) = person
+      field(xE)(yE) = ' '
+      xE += 1
+      println("d")
+    }
+
+    println( "ja" + inputlength)
+
     println("funktioniert")
     42
   }
@@ -197,4 +158,3 @@ class Field {
   }
 
 }
-
