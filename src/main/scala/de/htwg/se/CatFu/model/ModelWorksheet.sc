@@ -1,14 +1,13 @@
-/*
-case class Cell(x:Int, y:Int)
 
-val cell1 = Cell(4,5)
-cell1.x
-cell1.y
+import de.htwg.se.CatFu.model._
 
-case class Field(cells: Array[Cell])
+val pawn: Player = new Mage("Whiskers")
 
-val field1 = Field(Array.ofDim[Cell](1))
-field1.cells(0)=cell1
-field1.cells(0).x
-field1.cells(0).y
-*/
+val obs1 = Obstacle()
+
+pawn.setLvl(100) // scalastyle:ignore
+
+val enemy: Player = new Warrior("Mittens")
+
+println(pawn.hitrate(enemy))
+
