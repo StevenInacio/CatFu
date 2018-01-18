@@ -80,9 +80,15 @@ object CatFu {
     // Start Game
     // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
+    val player : Player = new Mage("Catmando")
     var board = new Field()
     board.clearField()
     board.fillrandomField()     // set Obstacles
+    userPrint(board)
+    userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
+    var userinput : String = "test noch leer"
+    userinput = readLine(">")
+    board.isvalid(player,userinput)
     userPrint(board)
 
 
