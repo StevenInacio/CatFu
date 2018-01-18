@@ -5,8 +5,8 @@ abstract case class Player() extends Thing {
   var currentXP = 0
   var lvl = 1
   var currentHP: Int
-  var posx : Int
-  var posy : Int
+  var posx : Int = 0
+  var posy : Int = 0
 
   def getMaxHP: Int
   def getAtt: Int

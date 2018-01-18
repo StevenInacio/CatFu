@@ -81,11 +81,13 @@ object CatFu {
     // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
     var board = new Field()
-    board.fillrandomField()
+    board.clearField()
+    board.fillrandomField()     // set Obstacles
     userPrint(board)
 
+
     // spawn it in
-    // set Obstacles
+
     // set Enemies to random upper locations
     // let Players decide where to place their pawns?
     // show Board and Controls on Screen

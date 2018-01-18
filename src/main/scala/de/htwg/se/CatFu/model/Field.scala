@@ -10,8 +10,18 @@ class Field {
   var yold : Int= 0
   var field = Array.ofDim[Thing](xfield, yfield)
 
+  /**
+    * Fills the Field with empty Things
+    */
   def clearField(): Unit = {
+    var empty = Empty()
     field = Array.ofDim[Thing](xfield,yfield)
+    for (i <- 0 until xfield){
+      for (j <- 0 until yfield){
+        field(i)(j) = empty
+      }
+    }
+
   }
   /**
     * ToString TUI <br>
@@ -19,17 +29,20 @@ class Field {
     * @return s a String
     */
   override def toString: String = {
+    var empty = Empty()
+    var rock = new Obstacle
     var s :String = ""
     var vertical = "----"
-    vertical = (vertical * yfield)+ "-"
-    for (i <- 0 to xfield-1) {
+    vertical = (vertical * yfield) + "-"
+    for (i <- 0 until xfield) { // to -1
       if (i > 0){ s += "|"}
       s += "\n" + vertical + "\n"
-      for (j <- 0 to yfield-1) {
-        if (field(i)(j) == 0) {
+      for (j <- 0 until yfield) { // to -1
+        if (field(i)(j) == empty) {
           s += "|   "
-        }
-        else {
+        } else  if (field(i)(j) == rock) {
+          s += "| "+rock.display+" "
+        }else{
           s += "| " + field(i)(j) +" "
         }
       }
