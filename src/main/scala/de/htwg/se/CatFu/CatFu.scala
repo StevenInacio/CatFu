@@ -1,74 +1,75 @@
 package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.model._
+
 import scala.io.StdIn.readLine
 
 object CatFu {
   def main(args: Array[String]): Unit = {
     menu()
     val student: Player = new Mage("Whiskers")
-    println(student.fullDescription)
+    userPrint(student.fullDescription)
     val enemy: Player = new Warrior("Lucifurr")
     enemy.setLvl(100) // scalastyle:ignore
-    println(enemy.fullDescription)
+    userPrint(enemy.fullDescription)
 
     for (_ <- 0 until 10) {
       val result = student.attack(enemy)
       if (result == -1) {
-        println(enemy.name + " is already dead!")
+        userPrint(enemy.name + " is already dead!")
       } else if (result != 0) {
-        println(student.name + " attacked " + enemy.name + " for " + result + " damage!")
-        println(enemy.currentHP)
+        userPrint(student.name + " attacked " + enemy.name + " for " + result + " damage!")
+        userPrint(enemy.currentHP)
       } else {
-        println("Miss")
+        userPrint("Miss")
       }
     }
-    println(student.fullDescription)
+    userPrint(student.fullDescription)
     val obs1 = Obstacle()
     val list: List[Thing] = List(student, enemy, obs1)
     for (x: Thing <- list) {
       x match {
-        case p: Player => println(p)
-        case o: Obstacle => println(o)
+        case p: Player => userPrint(p)
+        case o: Obstacle => userPrint(o)
       }
     }
-    println(student.hitrate(enemy))
-    println(enemy.hitrate(student))
+    userPrint(student.hitrate(enemy))
+    userPrint(enemy.hitrate(student))
     student.setLvl(100) // scalastyle:ignore
-    println(student.fullDescription)
-    println(enemy.fullDescription)
-    println(student.hitrate(enemy))
-    println(enemy.hitrate(student))
+    userPrint(student.fullDescription)
+    userPrint(enemy.fullDescription)
+    userPrint(student.hitrate(enemy))
+    userPrint(enemy.hitrate(student))
   }
 
   def menu(): Unit = {
-    println("\u001b[H\u001b[J")
+    userPrint("\u001b[H\u001b[J")
     var accepted = false
     while (!accepted) {
-      println(Console.RED + "Welcome to CatFu!" + Console.RESET)
-      println("What do you want to do?")
-      println(Console.RED + "S" + Console.RESET + "tart the Game")
-      println(Console.RED + "H" + Console.RESET + "ow To Play")
-      println(Console.RED + "E" + Console.RESET + "xit")
+      userPrint(Console.RED + "Welcome to CatFu!" + Console.RESET)
+      userPrint("What do you want to do?")
+      userPrint(Console.RED + "S" + Console.RESET + "tart the Game")
+      userPrint(Console.RED + "H" + Console.RESET + "ow To Play")
+      userPrint(Console.RED + "E" + Console.RESET + "xit")
       readLine(">") match {
         case "S" | "s" =>
-          println("Not yet implemented")
-          println("\u001b[H\u001b[J")
+          userPrint("Not yet implemented")
+          userPrint("\u001b[H\u001b[J")
           accepted = true
           start() // start()
         case "H" | "h" => help() // help()
         case "E" | "e" => System.exit(0)
-        case _ => println("What?")
+        case _ => userPrint("What?")
       }
     }
   }
 
   def userPrint(msg: Any): Unit = {
-    if (msg.isInstanceOf[String]) {
-      println(msg)
-    } else {
-      println(msg.toString)
-    }
+    println(msg)
+  }
+
+  def userPrint(): Unit = {
+    println()
   }
 
   def start(): Unit = {
@@ -79,6 +80,10 @@ object CatFu {
     // Start Game
     // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
+    var board = new Field()
+    board.fillrandomField()
+    userPrint(board)
+
     // spawn it in
     // set Obstacles
     // set Enemies to random upper locations
@@ -114,23 +119,23 @@ object CatFu {
   }
 
   def help(): Unit = {
-    print("\u001b[H\u001b[J")
-    println("CatFu is a so called " + Console.RED + "S" + Console.RESET + "trategic "
+    userPrint("\u001b[H\u001b[J")
+    userPrint("CatFu is a so called " + Console.RED + "S" + Console.RESET + "trategic "
       + Console.RED + "R" + Console.RESET + "ole-" + Console.RED + "P" + Console.RESET +
       "laying " + Console.RED + "G" + Console.RESET + "ame, or " + Console.RED + "SRPG" + Console.RESET + " for short.")
-    println("======================================================================")
-    println("Goal of the game is to defeat all of your enemies kittens.")
-    println("To achieve this, you must use your own Pawriors and Fleazards to attack and damage your enemy.")
-    println("To attack, you need to navigate your cats on the field to reach the Opurrnents with your attacks.")
-    println()
-    println("CLASSES\n==============================")
-    println(Console.YELLOW + "Pawriors" + Console.RESET + " use their claws as their favourite weapons, so they naturally have a range of only 1.")
-    println(Console.CYAN + "Fleazards" + Console.RESET + " have magical staffs. They can chant Spells of epical Purrportions, to reach far away enemies.")
-    println()
-    println("You lost when all your kittens are defeated. Hopefully they haven't used up all their 9 lives.")
-    println()
+    userPrint("======================================================================")
+    userPrint("Goal of the game is to defeat all of your enemies kittens.")
+    userPrint("To achieve this, you must use your own Pawriors and Fleazards to attack and damage your enemy.")
+    userPrint("To attack, you need to navigate your cats on the field to reach the Opurrnents with your attacks.")
+    userPrint()
+    userPrint("CLASSES\n==============================")
+    userPrint(Console.YELLOW + "Pawriors" + Console.RESET + " use their claws as their favourite weapons, so they naturally have a range of only 1.")
+    userPrint(Console.CYAN + "Fleazards" + Console.RESET + " have magical staffs. They can chant Spells of epical Purrportions, to reach far away enemies.")
+    userPrint()
+    userPrint("You lost when all your kittens are defeated. Hopefully they haven't used up all their 9 lives.")
+    userPrint()
     readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + " to continue.")
-    print("\u001b[H\u001b[J")
+    userPrint("\u001b[H\u001b[J")
   }
 }
 

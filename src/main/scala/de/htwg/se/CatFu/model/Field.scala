@@ -1,30 +1,31 @@
+package de.htwg.se.CatFu.model
+
+import de.htwg.se.CatFu.model._
+
 class Field {
   var inputlength = 0
-  var person = 'O'
-  var x: Int = 4
-  var y: Int = 4
-  var xold = 3
-  var yold = 1
-  var xE = 3  //current position
-  var yE = 1
-  val field = Array.ofDim[Char](x, y)
+  var xfield: Int = 7
+  var yfield: Int = 7
+  var xold : Int= 0
+  var yold : Int= 0
+  var field = Array.ofDim[Thing](xfield, yfield)
 
   def clearField(): Unit = {
-    for (i <- 0 to x - 1) {
-      for (j <- 0 to y - 1) {
-        field(i)(j) = ' '
-      }
-    }
+    field = Array.ofDim[Thing](xfield,yfield)
   }
-
+  /**
+    * ToString TUI <br>
+    * Prints the field
+    * @return s a String
+    */
   override def toString: String = {
     var s :String = ""
-    var waagstrich = "----"
-    waagstrich = (waagstrich * y)+ "-"
-    for (i <- 0 to x-1) {
+    var vertical = "----"
+    vertical = (vertical * yfield)+ "-"
+    for (i <- 0 to xfield-1) {
       if (i > 0){ s += "|"}
-      s += "\n" + waagstrich + "\n"
-      for (j <- 0 to y-1) {
+      s += "\n" + vertical + "\n"
+      for (j <- 0 to yfield-1) {
         if (field(i)(j) == 0) {
           s += "|   "
         }
@@ -33,128 +34,152 @@ class Field {
         }
       }
     }
-    s += "|\n" + waagstrich
+    s += "|\n" + vertical
     s
   }
 
-
+  /**
+    * Sets Random the Players<br>
+    *   At the beginning the game.
+    * @param enemy Team at the top of the field.
+    * @param player Team at the bottom of the field.
+    */
+def setUpTeams(player : List[Player], enemy : List[Player]): Unit ={
+  val random = new scala.util.Random
+  for(s <- player){
+    field(random.nextInt((1/3)*xfield) + (2/3)*xfield)(random.nextInt(yfield)) = s
+  }
+  for(s <- enemy){
+    field(random.nextInt((1/3)*xfield))(random.nextInt(yfield)) = s
+  }
+}
+  /**
+    * Sets Obstacles on random Positions<br>
+    *   in the Field
+    */
   def fillrandomField(): Unit = {
-    var n = 0
+    var rock = new Obstacle
     var p = 0
-    if(y>x) {
-      p = x
-    } else{p = y}
-    for(n <- 0 to p){ // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
-      var r1 = (Math.random()*x).toInt
-      var r2 = (Math.random()*y).toInt
-      println(r1)
-      println(r2)
-      // if(r1 <= x && r1 <= y && r2 <= x && r2 <= y){
-      field(r1)(r2) = 'R'
-      // }
+    if(yfield > xfield) {
+      p = xfield
+    } else{p = yfield}
+    for(_ <- 0 to p){ // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
+      var r1 = (Math.random()*xfield).toInt
+      var r2 = (Math.random()*yfield).toInt
+      if(r1 <= xfield && r1 <= yfield && r2 <= xfield && r2 <= yfield){
+      field(r1)(r2) = rock
+       }
     }
   }
 
-
-  //prüft, ob die Eingabe gültig war vong String her
-  def isvalid(userinput : String): Boolean = {
-    inputlength = 0
-    //if(eingabe.length <= getSpeed) geht
-    var wentwell = true
+  /**
+    * Checks if Userinput is valid<br>
+    * goes to match
+    *   and move
+    * MAKES A LIST = IS NEEDED???????
+    * @param p Player
+    * @param userinput String
+    * @return just a Checkbool
+    */
+  def isvalid(p: Player, userinput : String): Boolean = {
     import scala.collection.mutable.ListBuffer
-    var input = new ListBuffer[Char]()
-    for (i <- 0 until userinput.length) {
-      if(!matchTestValidInputSpace(userinput.charAt(i))) {// teste gültigkeit
-        println("falsche eingabe")
-        field(xE)(yE)=' '
-        field(xold)(yold) = person
-        return false
-      }else{
-        println("Eingabe richtig")
-        inputlength += 1
-        input += userinput.charAt(i)
-        realmove(userinput.charAt(i))
+    inputlength = 0
+    xold = p.posx
+    yold = p.posy
+    var wentwell = true
+    if (p.getSpeed < userinput.length) {
+          false
+    } else {
+      var input = new ListBuffer[Char]()
+      for (i <- 0 until userinput.length) {
+        if (!matchTestValidInputSpace(p,userinput.charAt(i))) {
+          p.posx = xold
+          p.posy = yold
+          return false
+        } else {
+          inputlength += 1
+          input += userinput.charAt(i)
+          realmove(p,userinput.charAt(i))
+        }
       }
+      val inputList = input.toList
+      wentwell
     }
-    val inputList = input.toList
-    println(inputList)
-    println("Eingelesene Zeichen  :"+inputlength)
-    wentwell
   }
 
-  def matchTestValidInputSpace(q: Char): Boolean = q match {
-    case 'a' if yE - 1 < y && yE - 1 >= 0   => true
-    case 'w' if xE-1 < x && xE-1 >= 0       => true
-    case 'd' if xE+1 < x && xE+1 >= 0       => true
-    case 's' if yE+1 < y && yE+1 >= 0       => true
+  /**
+    * Matches<br>
+    * single Char after wasd
+    * and even in the field
+    * and if the next field is empty
+    * @param p Player
+    * @param i Char
+    * @return just a Checkbool
+    */
+
+  def matchTestValidInputSpace(p : Player, i: Char): Boolean = i match {
+    case 'a' if (p.posy - 1 < yfield && p.posy - 1 >= 0) && field(p.posx)(p.posy - 1).isInstanceOf[Empty] => true
+    case 'w' if (p.posx - 1 < xfield && p.posx - 1 >= 0) && field(p.posx - 1)(p.posy).isInstanceOf[Empty] => true
+    case 'd' if (p.posx + 1 < xfield && p.posx + 1 >= 0) && field(p.posx + 1)(p.posy).isInstanceOf[Empty] => true
+    case 's' if (p.posy + 1 < yfield && p.posy + 1 >= 0) && field(p.posx)(p.posy + 1).isInstanceOf[Empty] => true
     case _ => false
   }
 
-  def move1(eingabe : String): Unit ={
-    if(!isvalid(eingabe)){
-      println("Du bist nicht du, wenn du hungrig bist. Falsche Eingabe")
-    }else{println("Purrrrfect")}
+  /**
+    * Moves a Thing <br>
+    * @param t Thing. Can be Player or Empty
+    * @param xnew New x position
+    * @param ynew New y position
+    */
+  def setPosition(t : Thing, xnew: Int, ynew: Int): Unit ={
+    field(xnew)(ynew) = t
   }
-
-
-  def vorunsfrei(zeichen: Char): Boolean = {  //spike
-    var zeichenvoruns = letter(zeichen)
-    if (zeichenvoruns != ' ') {
-      println("Halt, vor uns liegt :" + zeichenvoruns)
-      false
-    } else {
-      println("Test vor uns liegt :" + zeichenvoruns)
-      true
-    }
-  }
-
+  /**
+    * Moves the Player <br>
+    * And set the old Place to empty.
+    * @param input is a Char from the userinput, that were checked of valid from the method isvalid
+    * @param p is the Thing that will be moved.
+    * @return just a Checkbool
+    */
   // verknüpfen mit move2 weil das eine liste erstellt
-  def realmove(input: Char): Int = { // unbedingt clear zuerst
-    field(xE)(yE) = person
-    println("lets start")
-    if(!vorunsfrei(input)){
-      return 3
-    }
+  def realmove(p : Player, input: Char): Boolean = { // unbedingt clear zuerst
+    val empty = Empty()
+
     if (input == 'a') {
-      field(xE)(yE - 1) = person
-      field(xE)(yE) = ' '
-      yE -= 1
-      println("a")
+      setPosition(empty, p.posx, p.posy)  // Set empty behind player
+      setPosition(p, p.posx, p.posy - 1) // SetPlayer
+      p.posy = p.posy - 1
     }
     if (input == 'w') {
-      field(xE - 1)(yE) = person
-      field(xE)(yE) = ' '
-      xE -= 1
-      println("w")
+      setPosition(empty, p.posx, p.posy)  // Set empty behind player
+      setPosition(p, p.posx - 1, p.posy) // SetPlayer
+      p.posx -= 1
     }
     if (input == 's') {
-      field(xE)(yE + 1) = person
-      field(xE)(yE) = ' '
-      yE += 1
-      println("s")
+      setPosition(empty, p.posx, p.posy)  // Set empty behind player
+      setPosition(p, p.posx, p.posy + 1) // SetPlayer
+      p.posy += 1
     }
     if (input == 'd') {
-      field(xE + 1)(yE) = person
-      field(xE)(yE) = ' '
-      xE += 1
-      println("d")
+      setPosition(empty, p.posx, p.posy)  // Set empty behind player
+      setPosition(p, p.posx + 1, p.posy) // SetPlayer
+      p.posx += 1
     }
-
-    println( "ja" + inputlength)
-
-    println("funktioniert")
-    42
+    true
   }
 
 
-  //Keine Wiederholungen und deswegen das match erweitern
-
-  def letter(q: Char): Char= q match {
-    case 'a' => field(xE)(yE-1)
-    case 'w' => field(xE - 1)(yE);
-    case 'd' => field(xE+1)(yE)
-    case 's' => field(xE)(yE+1)
-    case _ => 'e'
+  /*
+    var newx = 0
+  var newy = 0
+  input match {
+    case 'a' => {newy = player.posy -1
+                 newx = player.posx}
+    case 'w' =>
   }
+
+  (0 until y).contains(newy)
+   */
+
 
 }
