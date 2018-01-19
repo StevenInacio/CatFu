@@ -7,9 +7,9 @@ import scala.io.StdIn.readLine
 object CatFu {
   def main(args: Array[String]): Unit = {
     menu()
-    val student: Player = new Mage("Whiskers")
+    val student: Player = new Mage("Whiskers", Console.GREEN)
     userPrint(student.fullDescription)
-    val enemy: Player = new Warrior("Lucifurr")
+    val enemy: Player = new Warrior("Lucifurr", Console.RED)
     enemy.setLvl(100) // scalastyle:ignore
     userPrint(enemy.fullDescription)
 
@@ -27,6 +27,19 @@ object CatFu {
     userPrint(student.fullDescription)
     val obs1 = Obstacle()
     val list: List[Thing] = List(student, enemy, obs1)
+    val playerList : List[Player] = List(student)
+    val enemyList : List[Player] = List(enemy)
+    var board = new Field()
+    board.clearField()
+    board.fillrandomField() // set Obstacles
+    board.setUpTeams(playerList, enemyList)
+    userPrint(board)
+
+    userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
+    var userinput: String = "test noch leer"
+    userinput = readLine(">")
+    userPrint( board.isvalid(student, userinput))
+    userPrint(board)
     for (x: Thing <- list) {
       x match {
         case p: Player => userPrint(p)
@@ -80,16 +93,6 @@ object CatFu {
     // Start Game
     // Generate 3-4 Random Enemies split playergroup total level among them
     // prepare Board
-    val player : Player = new Mage("Catmando")
-    var board = new Field()
-    board.clearField()
-    board.fillrandomField()     // set Obstacles
-    userPrint(board)
-    userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
-    var userinput : String = "test noch leer"
-    userinput = readLine(">")
-    board.isvalid(player,userinput)
-    userPrint(board)
 
 
     // spawn it in

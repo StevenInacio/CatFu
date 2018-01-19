@@ -2,11 +2,12 @@ package de.htwg.se.CatFu.model
 
 abstract case class Player() extends Thing {
   val name: String
+  val color: String = Console.WHITE
   var currentXP = 0
   var lvl = 1
   var currentHP: Int
-  var posx : Int = 0
-  var posy : Int = 0
+  var posx: Int = 0
+  var posy: Int = 0
 
   def getMaxHP: Int
   def getAtt: Int
@@ -132,7 +133,7 @@ abstract case class Player() extends Thing {
   }
 }
 
-class Mage(val name: String) extends Player() {
+class Mage(val name: String, override val color: String) extends Player() {
   override val display: Char = 'F'
   val base_hp: Int = 8
   val base_att: Int = 0
@@ -173,7 +174,7 @@ class Mage(val name: String) extends Player() {
   override def toString: String = name + ", the level " + lvl + " Fleazard"
 }
 
-class Warrior(val name: String) extends Player() {
+class Warrior(val name: String, override val color: String) extends Player() {
   override val display: Char = 'P'
   val base_hp: Int = 9
   val base_att: Int = 0
