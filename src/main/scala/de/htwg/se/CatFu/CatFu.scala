@@ -5,13 +5,25 @@ import de.htwg.se.CatFu.logic._
 import scala.io.StdIn.readLine
 
 object CatFu {
-  def main(args: Array[String]): Unit = {
-    menu()
+
+  var counter : Int = 0
+
+  var board = new Field()
+  val obs1 = Obstacle()
+  val list: List[Thing] = List(student, enemy, obs1)
+  val playerList: List[Player] = List(student)
+  val enemyList: List[Player] = List(enemy)
+
+
     val student: Player = new Mage("Whiskers", Console.GREEN)
     userPrint(student.fullDescription)
     val enemy: Player = new Warrior("Lucifurr", Console.RED)
     enemy.setLvl(100) // scalastyle:ignore
     userPrint(enemy.fullDescription)
+
+  def main(args: Array[String]): Unit = {
+
+    menu()
 
     for (_ <- 0 until 10) {
       val result = student.attack(enemy)
@@ -25,27 +37,19 @@ object CatFu {
       }
     }
     userPrint(student.fullDescription)
-    val obs1 = Obstacle()
-    val list: List[Thing] = List(student, enemy, obs1)
-    val playerList : List[Player] = List(student)
-    val enemyList : List[Player] = List(enemy)
-    var board = new Field()
-    board.clearField()
-    board.fillrandomField() // set Obstacles
-    board.setUpTeams(playerList, enemyList)
-    userPrint(board)
 
-    userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
-    var userinput: String = "test noch leer"
-    userinput = readLine(">")
-    userPrint( board.isvalid(student, userinput))
-    userPrint(board)
+
+
+
+
+
     for (x: Thing <- list) {
       x match {
         case p: Player => userPrint(p)
         case o: Obstacle => userPrint(o)
       }
     }
+
     userPrint(student.hitrate(enemy))
     userPrint(enemy.hitrate(student))
     student.setLvl(100) // scalastyle:ignore
@@ -53,6 +57,99 @@ object CatFu {
     userPrint(enemy.fullDescription)
     userPrint(student.hitrate(enemy))
     userPrint(enemy.hitrate(student))
+  }
+
+  def userinput(): String = {
+   var userinput = readLine(">")
+    userinput
+  }
+
+  def gameProcess(): Unit = {
+    val p :Player = playerChoose()
+    actionmenu(p)
+
+    var input = userinput()
+
+    userPrint(board)
+
+//    if (intsteps != 0) {
+  //    userPrint(board.isvalid(enemy, input, intsteps))
+    //}
+
+    userPrint(board)
+  }
+
+  def move(p: Player): Unit ={
+    userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
+    var intsteps = board.isvalid(p,userinput(),p.getSpeed)
+    if (intsteps > 0){
+      actionmenu(p)
+    }
+  }
+
+  def playerChoose(): Player = {
+    //if(liste von charakter == 0) -> nehme den einen und geh gleich zu actionmenu
+    // ansonsten fragen, welchen er benutzen möchte:
+
+    var accepted = false
+    while (!accepted) {
+      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+      userPrint(Console.RED + "Which Pokemon" + Console.RESET +
+        "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
+      //Liste von Charakter, die der User noch hat.
+      //Listen index dann eingeben????????
+      userPrint(Console.RED + "M" + Console.RESET + "age")
+      userPrint(Console.RED + "P" + Console.RESET + "awior")
+      userPrint(Console.RED + "H" + Console.RESET + "ow To Play")
+      userPrint(Console.RED + "E" + Console.RESET + "xit")
+      userinput() match {
+        case "M" | "m" =>
+          userPrint("Not yet implemented")
+          userPrint("\u001b[H\u001b[J")
+          accepted = true
+          return new Mage("hmania", "BLUE")
+        case "P" | "p" =>
+          userPrint("Not yet implemented")
+          userPrint("\u001b[H\u001b[J")
+          accepted = true
+          return new Warrior("hmania aha", "BLUE")
+        case "H" | "h" => help()
+        case "E" | "e" => System.exit(0)
+        case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
+          "It´s not a Game for cats. It´s a game about cats, buddy.")
+      }
+    }
+    new Mage("blablabla","WHITE")
+  }
+
+  def actionmenu(player: Player): Unit = {
+    userPrint("\u001b[H\u001b[J")
+    var accepted = false
+    while (!accepted) {
+      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+      userPrint("What do you want to do?")
+      userPrint(Console.RED + "M" + Console.RESET + "ove")
+      userPrint(Console.RED + "A" + Console.RESET + "ttack")
+      userPrint(Console.RED + "H" + Console.RESET + "ow To Play")
+      userPrint(Console.RED + "E" + Console.RESET + "xit")
+      userPrint(Console.RED + "P" + Console.RESET + "et a cat.")
+      readLine(">") match {
+        case "M" | "m" =>
+          userPrint("Not yet implemented")
+          userPrint("\u001b[H\u001b[J")
+          accepted = true
+        move(player)
+        case "A" | "a" =>
+          userPrint("Not yet implemented")
+          userPrint("\u001b[H\u001b[J")
+          accepted = true
+          //attack(player)
+        case "H" | "h" => help()
+        case "E" | "e" => System.exit(0)
+        case _ | "P" | "p" => userPrint("What? Please try it again and get your Cat away from your keys." +
+          "It´s not a Game for cats. It´s a game about cats, buddy.")
+      }
+    }
   }
 
   def menu(): Unit = {
@@ -69,8 +166,8 @@ object CatFu {
           userPrint("Not yet implemented")
           userPrint("\u001b[H\u001b[J")
           accepted = true
-          start() // start()
-        case "H" | "h" => help() // help()
+          start()
+        case "H" | "h" => help()
         case "E" | "e" => System.exit(0)
         case _ => userPrint("What?")
       }
@@ -88,10 +185,16 @@ object CatFu {
   def start(): Unit = {
     // Player management up to 4 ()
     val manager = PlayerManagement
+    board.clearField()
+    board.fillrandomField() // set Obstacles
+    board.setUpTeams(playerList, enemyList)
+    userPrint(board)
+    gameProcess()
     // Load Players
     // Create Players // make a Player Factory?
     // remove Players
     // Start Game
+
     // Generate 3-4 Random Enemies split playergroup total level among them
     // Enemy Factory. Abstract or Method Combine with Player?
     // prepare Board

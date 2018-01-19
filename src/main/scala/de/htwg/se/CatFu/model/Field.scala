@@ -100,23 +100,24 @@ class Field {
    * MAKES A LIST = IS NEEDED???????
    * @param p Player
    * @param userinput String
-   * @return just a Checkbool
+   * @return inputlength is an Int that said how many steps Player did.
    */
-  def isvalid(p: Player, userinput: String): Boolean = {
+  def isvalid(p: Player, userinput: String, intsteps: Int): Int = {
     import scala.collection.mutable.ListBuffer
+    var remainingMoves = intsteps
     inputlength = 0
     xold = p.posx
     yold = p.posy
     println(userinput.length)
     if (p.getSpeed < userinput.length) {
-      false
+      -1
     } else {
       var input = new ListBuffer[Char]()
       for (i <- 0 until userinput.length) {
         if (!matchTestValidInputSpace(p, userinput.charAt(i))) {
           p.posx = xold
           p.posy = yold
-          return false
+          -2
         } else {
           inputlength += 1
           input += userinput.charAt(i)
@@ -125,7 +126,8 @@ class Field {
         }
       }
       val inputList = input.toList
-      true
+      remainingMoves = inputlength
+      inputlength
     }
   }
 
@@ -177,12 +179,12 @@ class Field {
       setPosition(p, p.posx - 1, p.posy) // SetPlayer
       p.posx -= 1
     }
-    if (input == 's') {
+    if (input == 'd') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx, p.posy + 1) // SetPlayer
       p.posy += 1
     }
-    if (input == 'd') {
+    if (input == 's') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx + 1, p.posy) // SetPlayer
       p.posx += 1
@@ -191,17 +193,16 @@ class Field {
   }
 
   /**
-    * Calculate the Distance between two Players
-    * @param start is a Player
-    * @param end is a Player
-    * @return the Distance in int
-    */
-  def getDistance(start : Player , end : Player): Int ={
+   * Calculate the Distance between two Players
+   * @param start is a Player
+   * @param end is a Player
+   * @return the Distance in int
+   */
+  def getDistance(start: Player, end: Player): Int = {
     val x = start.posx - end.posx
-      val y = start.posy - end.posy
-    x+y
+    val y = start.posy - end.posy
+    x + y
   }
-
 
   /*
     var newx = 0
