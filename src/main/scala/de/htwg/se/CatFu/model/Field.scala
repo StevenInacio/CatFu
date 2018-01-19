@@ -21,7 +21,6 @@ class Field {
         field(i)(j) = empty
       }
     }
-
   }
   /**
    * ToString TUI <br>
