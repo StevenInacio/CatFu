@@ -9,3 +9,7 @@ case class Empty() extends Thing() {
   override val display: Char = ' '
   override val color: String = Console.WHITE
 }
+
+case class Empty() extends Thing() {
+  override val display: Char = ' '
+}

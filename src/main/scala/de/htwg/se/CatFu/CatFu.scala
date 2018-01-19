@@ -1,7 +1,7 @@
 package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.model._
-
+import de.htwg.se.CatFu.logic._
 import scala.io.StdIn.readLine
 
 object CatFu {
@@ -87,21 +87,26 @@ object CatFu {
 
   def start(): Unit = {
     // Player management up to 4 ()
+    val manager = PlayerManagement
     // Load Players
-    // Create Players
+    // Create Players // make a Player Factory?
     // remove Players
     // Start Game
     // Generate 3-4 Random Enemies split playergroup total level among them
+    // Enemy Factory. Abstract or Method Combine with Player?
     // prepare Board
-
-
     // spawn it in
-
+    // set Obstacles
     // set Enemies to random upper locations
     // let Players decide where to place their pawns?
+    // need a menu for that.
     // show Board and Controls on Screen
-    // randomize which turn it is
-    // start appropriate turn
+    /*val rand = new scala.util.Random
+    rand.nextBoolean() match {
+      case true => playerTurn()
+      case false => enemyTurn()
+    }*/
+    enemyTurn()
   }
 
   def playerTurn(): Unit = {
@@ -123,10 +128,12 @@ object CatFu {
     // wait (immediately set available to false and continue)
     // cancel to previous menu
     // End Turn
+    menu()
   }
 
   def enemyTurn(): Unit = {
     // see User Turn, but with AI
+    playerTurn()
   }
 
   def help(): Unit = {
@@ -143,10 +150,11 @@ object CatFu {
     userPrint(Console.YELLOW + "Pawriors" + Console.RESET + " use their claws as their favourite weapons, so they naturally have a range of only 1.")
     userPrint(Console.CYAN + "Fleazards" + Console.RESET + " have magical staffs. They can chant Spells of epical Purrportions, to reach far away enemies.")
     userPrint()
-    userPrint("You lost when all your kittens are defeated. Hopefully they haven't used up all their 9 lives.")
+    userPrint("You lost when all your kitties are defeated. Hopefully they haven't used up all their 9 lives.")
     userPrint()
     readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + " to continue.")
     userPrint("\u001b[H\u001b[J")
   }
 }
 
+//undo should get a "last called function" but then turn parameters around accordingly.
