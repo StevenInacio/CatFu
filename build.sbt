@@ -16,7 +16,7 @@ libraryDependencies ++= {
 }
 
 libraryDependencies += "junit" % "junit" % "4.8" % "test"
-
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.7"
 
 fork in run := false
 connectInput in run := true

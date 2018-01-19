@@ -27,8 +27,8 @@ object CatFu {
     userPrint(student.fullDescription)
     val obs1 = Obstacle()
     val list: List[Thing] = List(student, enemy, obs1)
-    val playerList : List[Player] = List(student)
-    val enemyList : List[Player] = List(enemy)
+    val playerList: List[Player] = List(student)
+    val enemyList: List[Player] = List(enemy)
     var board = new Field()
     board.clearField()
     board.fillrandomField() // set Obstacles
@@ -38,7 +38,7 @@ object CatFu {
     userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
     var userinput: String = "test noch leer"
     userinput = readLine(">")
-    userPrint( board.isvalid(student, userinput))
+    userPrint(board.isvalid(student, userinput))
     userPrint(board)
     for (x: Thing <- list) {
       x match {
@@ -88,6 +88,7 @@ object CatFu {
   def start(): Unit = {
     // Player management up to 4 ()
     val manager = PlayerManagement
+
     // Load Players
     // Create Players // make a Player Factory?
     // remove Players

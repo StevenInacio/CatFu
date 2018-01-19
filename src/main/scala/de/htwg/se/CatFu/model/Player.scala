@@ -1,7 +1,8 @@
-/***
-  * @author Steven Inácio
-  * @version 0.1 <18.01.2018>
-  */
+/**
+ * *
+ * @author Steven Inácio
+ * @version 0.1 <18.01.2018>
+ */
 
 package de.htwg.se.CatFu.model
 

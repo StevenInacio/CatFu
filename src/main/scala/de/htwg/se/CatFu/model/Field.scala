@@ -191,17 +191,16 @@ class Field {
   }
 
   /**
-    * Calculate the Distance between two Players
-    * @param start is a Player
-    * @param end is a Player
-    * @return the Distance in int
-    */
-  def getDistance(start : Player , end : Player): Int ={
+   * Calculate the Distance between two Players
+   * @param start is a Player
+   * @param end is a Player
+   * @return the Distance in int
+   */
+  def getDistance(start: Player, end: Player): Int = {
     val x = start.posx - end.posx
-      val y = start.posy - end.posy
-    x+y
+    val y = start.posy - end.posy
+    x + y
   }
-
 
   /*
     var newx = 0
