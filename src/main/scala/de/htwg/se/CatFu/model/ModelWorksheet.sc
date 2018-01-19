@@ -10,3 +10,4 @@ val enemy: Player = new Warrior("Mittens")
 
 println(pawn.hitrate(enemy))
 
+pawn.attack(enemy)

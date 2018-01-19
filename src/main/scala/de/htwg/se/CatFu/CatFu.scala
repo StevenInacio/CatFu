@@ -1,6 +1,7 @@
 package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.model._
+import de.htwg.se.CatFu.logic._
 import scala.io.StdIn.readLine
 
 object CatFu {
@@ -40,6 +41,7 @@ object CatFu {
 
   def start(): Unit = {
     // Player management up to 4 ()
+    val manager = PlayerManagement
     // Load Players
     // Create Players // make a Player Factory?
     // remove Players
