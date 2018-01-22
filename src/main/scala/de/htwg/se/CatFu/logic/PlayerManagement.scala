@@ -4,7 +4,6 @@ import de.htwg.se.CatFu.model.{Mage, Player, Warrior}
 import play.api.libs.json._
 
 import scala.io.Source
-import scala.reflect.io.File
 
 object PlayerManagement {
 

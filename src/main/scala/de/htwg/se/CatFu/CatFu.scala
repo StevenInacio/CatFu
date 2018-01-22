@@ -5,13 +5,25 @@ import de.htwg.se.CatFu.logic._
 import scala.io.StdIn.readLine
 
 object CatFu {
+
+  var counter: Int = 0
+
+  var board = new Field()
+  val obs1 = Obstacle()
+  val list: List[Thing] = List(student, enemy, obs1)
+  val playerList: List[Player] = List(student)
+  val enemyList: List[Player] = List(enemy)
+
+
+  val student: Player = new Mage("Whiskers", Console.GREEN)
+  userPrint(student.fullDescription)
+  val enemy: Player = new Warrior("Lucifurr", Console.RED)
+  enemy.setLvl(100) // scalastyle:ignore
+  userPrint(enemy.fullDescription)
+
   def main(args: Array[String]): Unit = {
-    menu()
-    val student: Player = new Mage("Whiskers", Console.GREEN)
-    userPrint(student.fullDescription)
-    val enemy: Player = new Warrior("Lucifurr", Console.RED)
-    enemy.setLvl(100) // scalastyle:ignore
-    userPrint(enemy.fullDescription)
+    testDijkstra()
+    /*menu()
 
     for (_ <- 0 until 10) {
       val result = student.attack(enemy)
@@ -25,20 +37,11 @@ object CatFu {
       }
     }
     userPrint(student.fullDescription)
-    val obs1 = Obstacle()
-    val list: List[Thing] = List(student, enemy, obs1)
-    val playerList: List[Player] = List(student)
-    val enemyList: List[Player] = List(enemy)
-    val board = new Field()
-    board.clearField()
-    board.fillrandomField() // set Obstacles
-    board.setUpTeams(playerList, enemyList)
-    userPrint(board)
 
     userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
     var userinput: String = "test noch leer"
     userinput = readLine(">")
-    userPrint(board.isvalid(student, userinput))
+    userPrint( board.isvalid(student, userinput))
     userPrint(board)
     for (x: Thing <- list) {
       x match {
@@ -46,17 +49,103 @@ object CatFu {
         case o: Obstacle => userPrint(o)
       }
     }
+
     userPrint(student.hitrate(enemy))
     userPrint(enemy.hitrate(student))
     student.setLvl(100) // scalastyle:ignore
     userPrint(student.fullDescription)
     userPrint(enemy.fullDescription)
     userPrint(student.hitrate(enemy))
-    userPrint(enemy.hitrate(student))
+    userPrint(enemy.hitrate(student))*/
+  }
+
+  def userinput(): String = {
+    val userinput = readLine(">")
+    userinput
+  }
+
+  def gameProcess(): Unit = {
+    val p: Player = playerChoose()
+    actionmenu(p)
+
+    var input = userinput()
+
+    userPrint(board)
+
+    //    if (intsteps != 0) {
+    //    userPrint(board.isvalid(enemy, input, intsteps))
+    //}
+
+    userPrint(board)
+  }
+
+  def move(p: Player): Unit = {
+    userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
+    val intsteps = board.isvalid(p, userinput(), p.getSpeed)
+    if (intsteps > 0) {
+      actionmenu(p)
+    }
+  }
+
+  def playerChoose(): Player = {
+    //if(liste von charakter == 0) -> nehme den einen und geh gleich zu actionmenu
+    // ansonsten fragen, welchen er benutzen möchte:
+
+    var accepted = false
+    var index = -1
+    while (!accepted) {
+      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+      userPrint(Console.RED + "Which Pokemon" + Console.RESET +
+        "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
+      //Liste von Charakter, die der User noch hat.
+      //Listen index dann eingeben???????? korrekt.
+      for (x: Int <- playerList.length) {
+        userPrint(Console.RED + (x + 1) + ":" + Console.RESET + playerList(x).name)
+      }
+      userPrint(Console.RED + "C" + Console.RESET + "ancel")
+      userinput() match {
+        case x if playerList.indices contains (x.toInt - 1) => index = x.toInt - 1
+          accepted = true
+        case "C" | "c" => ()
+        case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
+          "It´s not a Game for cats. It´s a game about cats, buddy.")
+      }
+    }
+    playerList(index)
+  }
+
+  def actionmenu(player: Player): Unit = {
+    clearScreen()
+    var accepted = false
+    while (!accepted) {
+      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+      userPrint("What do you want to do?")
+      userPrint(Console.RED + "M" + Console.RESET + "ove")
+      userPrint(Console.RED + "A" + Console.RESET + "ttack")
+      userPrint(Console.RED + "H" + Console.RESET + "ow To Play")
+      userPrint(Console.RED + "E" + Console.RESET + "xit")
+      userPrint(Console.RED + "P" + Console.RESET + "et a cat.")
+      readLine(">") match {
+        case "M" | "m" =>
+          userPrint("Not yet implemented")
+          clearScreen()
+          accepted = true
+          move(player)
+        case "A" | "a" =>
+          userPrint("Not yet implemented")
+          clearScreen()
+          accepted = true
+        //attack(player)
+        case "H" | "h" => help()
+        case "E" | "e" => System.exit(0)
+        case _ | "P" | "p" => userPrint("What? Please try it again and get your Cat away from your keys." +
+          "It´s not a Game for cats. It´s a game about cats, buddy.")
+      }
+    }
   }
 
   def menu(): Unit = {
-    userPrint("\u001b[H\u001b[J")
+    clearScreen()
     var accepted = false
     while (!accepted) {
       userPrint(Console.RED + "Welcome to CatFu!" + Console.RESET)
@@ -67,10 +156,10 @@ object CatFu {
       readLine(">") match {
         case "S" | "s" =>
           userPrint("Not yet implemented")
-          userPrint("\u001b[H\u001b[J")
+          clearScreen()
           accepted = true
-          start() // start()
-        case "H" | "h" => help() // help()
+          start()
+        case "H" | "h" => help()
         case "E" | "e" => System.exit(0)
         case _ => userPrint("What?")
       }
@@ -85,8 +174,59 @@ object CatFu {
     println()
   }
 
+  def clearScreen() : Unit = {
+    println("\u001b[H\u001b[J")
+  }
+
+  def printCharacterMenu(list: List[Player]) : Unit = {
+    if (list.length > 4) {
+      userPrint(Console.RED + "TOO MANY KITTENS" + Console.RESET)
+    }
+    userPrint(Console.GREEN + "Selected Character:")
+    for (x <- list) {
+      userPrint(x)
+    }
+    userPrint(Console.RESET)
+    userPrint("Do you want to")
+    userPrint(Console.RED + "L" + Console.RESET + "oad a Character?")
+    userPrint(Console.RED + "C" + Console.RESET + "reate a new Kitten?")
+    userPrint(Console.RED + "G" + Console.RESET + "enerate a random Team?")
+    userPrint(Console.RED + "S" + Console.RESET + "tart the game or")
+    userPrint(Console.RED + "E" + Console.RESET + "xit while you still can?")
+  }
+
+  def loadMenu(): Player = {
+    userPrint("Please tell me the kitten you want to load.")
+    match PlayerManagement.load(userinput()) {
+      case Some(x) => x
+      case None => userPrint("Kitten not found.")
+    }
+  }
+
+  def characterMenu() : List[Player] = {
+    var list: List[Player] = List()
+    var accepted = false
+    while (!accepted) {
+      clearScreen()
+      printCharacterMenu(list)
+      userinput() match {
+        case "L" | "l" => list = list ++ loadMenu()
+        case "C" | "c" => list = list ++ createMenu()
+        case "G" | "g" => list = PlayerManagement.randomTeam()
+        case "S" | "s" => if (list.nonEmpty && list.length < 5) accepted = true
+        case "E" | "e" => sys.exit(0)
+      }
+    }
+  }
+
   def start(): Unit = {
     // Player management up to 4 ()
+    val playerTeam = characterMenu()
+    board.clearField()
+    board.fillrandomField() // set Obstacles
+    board.setUpTeams(playerList, enemyList)
+    userPrint(board)
+    gameProcess()
     // Load Players
     // Create Players // make a Player Factory?
     // remove Players
@@ -136,7 +276,7 @@ object CatFu {
   }
 
   def help(): Unit = {
-    userPrint("\u001b[H\u001b[J")
+    clearScreen()
     userPrint("CatFu is a so called " + Console.RED + "S" + Console.RESET + "trategic "
       + Console.RED + "R" + Console.RESET + "ole-" + Console.RED + "P" + Console.RESET +
       "laying " + Console.RED + "G" + Console.RESET + "ame, or " + Console.RED + "SRPG" + Console.RESET + " for short.")
@@ -152,7 +292,23 @@ object CatFu {
     userPrint("You lost when all your kitties are defeated. Hopefully they haven't used up all their 9 lives.")
     userPrint()
     readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + " to continue.")
-    userPrint("\u001b[H\u001b[J")
+    clearScreen()
+  }
+
+  def testDijkstra(): Unit = {
+    val field = new Field
+    field.clearField()
+    field.setPosition(Obstacle(), 2, 4)
+    field.setPosition(Obstacle(), 3, 3)
+    field.setPosition(Obstacle(), 3, 6)
+    field.setPosition(Obstacle(), 1, 5)
+    val p = new Mage("Peter", Console.GREEN)
+    field.setPosition(p, 3, 4)
+    p.posx = 3
+    p.posy = 4
+    val
+    list = field.dijkstra(p)
+    println(field.highlight(list))
   }
 }
 
