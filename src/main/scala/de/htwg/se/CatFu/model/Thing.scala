@@ -5,6 +5,6 @@ abstract class Thing() {
   val color: String
 }
 
-case class Empty(override val color : String) extends Thing() {
+case class Empty(override val color: String) extends Thing() {
   override val display: Char = ' '
 }

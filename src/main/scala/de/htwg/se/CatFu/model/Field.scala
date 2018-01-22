@@ -141,14 +141,11 @@ class Field {
    * @return just a Checkbool
    */
   // scalastyle:off
-  def matchTestValidInputSpace(p: Player, i: Char): Boolean = i match {
-    case 'a' if (p.posy - 1 < yfield && p.posy - 1 >= 0) && field(p.posx)(p.posy - 1).isInstanceOf[Empty] => true
-    case 'w' if (p.posx - 1 < xfield && p.posx - 1 >= 0) && field(p.posx - 1)(p.posy).isInstanceOf[Empty] => true
-    case 'd' if (p.posx + 1 < xfield && p.posx + 1 >= 0) && field(p.posx + 1)(p.posy).isInstanceOf[Empty] => true
-    case 's' if (p.posy + 1 < yfield && p.posy + 1 >= 0) && field(p.posx)(p.posy + 1).isInstanceOf[Empty] => true
-    case _ => false
+  def matchTestValidInputSpace(p: Player, i: Char): Boolean = {
+    matchTestValidInputSpace((p.posx, p.posy), i)
   }
-  def matchTestValidInputSpace(x : (Int,Int) , i: Char): Boolean = i match {
+
+  def matchTestValidInputSpace(x: (Int, Int), i: Char): Boolean = i match {
     case 'a' if (x._2 - 1 < yfield && x._2 - 1 >= 0) && field(x._1)(x._2 - 1).isInstanceOf[Empty] => true
     case 'w' if (x._1 - 1 < xfield && x._1 - 1 >= 0) && field(x._1 - 1)(x._2).isInstanceOf[Empty] => true
     case 's' if (x._1 + 1 < xfield && x._1 + 1 >= 0) && field(x._1 + 1)(x._2).isInstanceOf[Empty] => true
@@ -235,8 +232,8 @@ class Field {
     }
   }*/
 
-  def dijkstra(p: Player) : List[(Int,Int)] = {
-    var map: Map[(Int,Int),Boolean] = Map((p.posx, p.posy) -> false)
+  def dijkstra(p: Player): List[(Int, Int)] = {
+    var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
 
     for (i <- 0 until p.getSpeed) {
       for (x <- map.filter((t) => !t._2).keys) {
@@ -258,7 +255,11 @@ class Field {
     map.keys.toList
   }
 
-  def highlight(list: List[(Int,Int)]) : String = {
+  def highlight(p: Player): String = {
+    highlight(List((p.posx, p.posy)))
+  }
+
+  def highlight(list: List[(Int, Int)]): String = {
     val empty = Empty(Console.WHITE)
     val rock = new Obstacle
     val reset = Console.RESET
@@ -270,7 +271,7 @@ class Field {
       s += "\n" + vertical + "\n"
       for (j <- 0 until yfield) { // to -1
         val thing: Thing = field(i)(j)
-        if (list.contains((i,j))) {
+        if (list.contains((i, j))) {
           if (thing == empty) {
             s += "|" + Console.MAGENTA_B + "   " + reset
           } else if (thing == rock) {
@@ -278,8 +279,7 @@ class Field {
           } else {
             s += "| " + Console.MAGENTA_B + thing.color + thing.display + reset + " "
           }
-        }
-        else {
+        } else {
           if (thing == empty) {
             s += "|   "
           } else if (thing == rock) {
@@ -293,8 +293,6 @@ class Field {
     s += "|\n" + vertical
     s
   }
-
-
 
   /*
     var newx = 0

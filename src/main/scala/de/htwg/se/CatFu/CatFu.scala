@@ -2,6 +2,8 @@ package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.model._
 import de.htwg.se.CatFu.logic._
+
+import scala.collection.JavaConverters._
 import scala.io.StdIn.readLine
 
 object CatFu {
@@ -10,53 +12,11 @@ object CatFu {
 
   var board = new Field()
   val obs1 = Obstacle()
-  val list: List[Thing] = List(student, enemy, obs1)
-  val playerList: List[Player] = List(student)
-  val enemyList: List[Player] = List(enemy)
-
-
-  val student: Player = new Mage("Whiskers", Console.GREEN)
-  userPrint(student.fullDescription)
-  val enemy: Player = new Warrior("Lucifurr", Console.RED)
-  enemy.setLvl(100) // scalastyle:ignore
-  userPrint(enemy.fullDescription)
+  var playerList: List[Player] = List()
+  var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-    testDijkstra()
-    /*menu()
-
-    for (_ <- 0 until 10) {
-      val result = student.attack(enemy)
-      if (result == -1) {
-        userPrint(enemy.name + " is already dead!")
-      } else if (result != 0) {
-        userPrint(student.name + " attacked " + enemy.name + " for " + result + " damage!")
-        userPrint(enemy.currentHP)
-      } else {
-        userPrint("Miss")
-      }
-    }
-    userPrint(student.fullDescription)
-
-    userPrint(Console.RED + "Bitte wasd eingeben" + Console.RESET + "  comprende???")
-    var userinput: String = "test noch leer"
-    userinput = readLine(">")
-    userPrint( board.isvalid(student, userinput))
-    userPrint(board)
-    for (x: Thing <- list) {
-      x match {
-        case p: Player => userPrint(p)
-        case o: Obstacle => userPrint(o)
-      }
-    }
-
-    userPrint(student.hitrate(enemy))
-    userPrint(enemy.hitrate(student))
-    student.setLvl(100) // scalastyle:ignore
-    userPrint(student.fullDescription)
-    userPrint(enemy.fullDescription)
-    userPrint(student.hitrate(enemy))
-    userPrint(enemy.hitrate(student))*/
+    menu()
   }
 
   def userinput(): String = {
@@ -71,15 +31,10 @@ object CatFu {
     var input = userinput()
 
     userPrint(board)
-
-    //    if (intsteps != 0) {
-    //    userPrint(board.isvalid(enemy, input, intsteps))
-    //}
-
-    userPrint(board)
   }
 
   def move(p: Player): Unit = {
+    userPrint(board.highlight(board.dijkstra(p)))
     userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
     val intsteps = board.isvalid(p, userinput(), p.getSpeed)
     if (intsteps > 0) {
@@ -99,12 +54,13 @@ object CatFu {
         "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
       //Liste von Charakter, die der User noch hat.
       //Listen index dann eingeben???????? korrekt.
-      for (x: Int <- playerList.length) {
-        userPrint(Console.RED + (x + 1) + ":" + Console.RESET + playerList(x).name)
+      for (x: Int <- playerList.indices) {
+        userPrint(Console.RED + (x + 1) + ":" + Console.RESET + playerList(x).name + " @ (" + playerList(x).posy + "," + playerList(x).posx + ")")
       }
       userPrint(Console.RED + "C" + Console.RESET + "ancel")
       userinput() match {
-        case x if playerList.indices contains (x.toInt - 1) => index = x.toInt - 1
+        case x if playerList.indices contains (x.toInt - 1) =>
+          index = x.toInt - 1
           accepted = true
         case "C" | "c" => ()
         case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
@@ -118,6 +74,7 @@ object CatFu {
     clearScreen()
     var accepted = false
     while (!accepted) {
+      userPrint(board.highlight(player))
       userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
       userPrint("What do you want to do?")
       userPrint(Console.RED + "M" + Console.RESET + "ove")
@@ -174,11 +131,11 @@ object CatFu {
     println()
   }
 
-  def clearScreen() : Unit = {
+  def clearScreen(): Unit = {
     println("\u001b[H\u001b[J")
   }
 
-  def printCharacterMenu(list: List[Player]) : Unit = {
+  def printCharacterMenu(list: List[Player]): Unit = {
     if (list.length > 4) {
       userPrint(Console.RED + "TOO MANY KITTENS" + Console.RESET)
     }
@@ -195,15 +152,30 @@ object CatFu {
     userPrint(Console.RED + "E" + Console.RESET + "xit while you still can?")
   }
 
-  def loadMenu(): Player = {
+  def loadMenu(): List[Player] = {
     userPrint("Please tell me the kitten you want to load.")
-    match PlayerManagement.load(userinput()) {
-      case Some(x) => x
-      case None => userPrint("Kitten not found.")
+    PlayerManagement.loadCharacter(userinput()) match {
+      case Some(x) => List(x)
+      case None =>
+        userPrint("Kitten not found.")
+        List()
     }
   }
 
-  def characterMenu() : List[Player] = {
+  def createMenu(): List[Player] = {
+    userPrint("What's the name of the new Kitty?")
+    val name = userinput()
+    userPrint("Is the new Feline a " + Console.RED + "P" + Console.RESET + "awrior or a " + Console.RED + "F" + Console.RESET + "leazard?")
+    userinput() match {
+      case "P" | "p" => List(PlayerManagement.createWarrior(name, 1))
+      case "F" | "f" => List(PlayerManagement.createMage(name, 1))
+      case _ =>
+        userPrint("I couldn't understand that.")
+        List()
+    }
+  }
+
+  def characterMenu(): List[Player] = {
     var list: List[Player] = List()
     var accepted = false
     while (!accepted) {
@@ -217,11 +189,13 @@ object CatFu {
         case "E" | "e" => sys.exit(0)
       }
     }
+    list
   }
 
   def start(): Unit = {
     // Player management up to 4 ()
-    val playerTeam = characterMenu()
+    playerList = characterMenu()
+    enemyList = PlayerManagement.enemyTeam(playerList)
     board.clearField()
     board.fillrandomField() // set Obstacles
     board.setUpTeams(playerList, enemyList)
@@ -295,6 +269,7 @@ object CatFu {
     clearScreen()
   }
 
+  // scalastyle:off
   def testDijkstra(): Unit = {
     val field = new Field
     field.clearField()
@@ -306,10 +281,10 @@ object CatFu {
     field.setPosition(p, 3, 4)
     p.posx = 3
     p.posy = 4
-    val
-    list = field.dijkstra(p)
+    val list = field.dijkstra(p)
     println(field.highlight(list))
   }
+  // scalastyle:on
 }
 
 //undo should get a "last called function" but then turn parameters around accordingly.
