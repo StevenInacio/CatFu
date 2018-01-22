@@ -1,9 +1,9 @@
 package de.htwg.se.CatFu
 
+import de.htwg.se.CatFu.CatFu.start
 import de.htwg.se.CatFu.model._
 import de.htwg.se.CatFu.logic._
 
-import scala.collection.JavaConverters._
 import scala.io.StdIn.readLine
 
 object CatFu {
@@ -25,15 +25,23 @@ object CatFu {
   }
 
   def gameProcess(): Unit = {
-    val p: Player = playerChoose()
-    actionmenu(p)
-
-    var input = userinput()
-
     userPrint(board)
+    var accepted = false
+    var p: Player = NoPlayer
+    while (!accepted) {
+      val result = playerChoose()
+      result match {
+        case Some(x) =>
+          p = x
+          accepted = true
+        case None => userPrint("There was an Error.")
+      }
+    }
+    actionmenu(p)
   }
 
   def move(p: Player): Unit = {
+    clearScreen()
     userPrint(board.highlight(board.dijkstra(p)))
     userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
     val intsteps = board.isvalid(p, userinput(), p.getSpeed)
@@ -42,13 +50,16 @@ object CatFu {
     }
   }
 
-  def playerChoose(): Player = {
+  def playerChoose(): Option[Player] = {
     //if(liste von charakter == 0) -> nehme den einen und geh gleich zu actionmenu
     // ansonsten fragen, welchen er benutzen möchte:
 
     var accepted = false
     var index = -1
+    var falseInput = false
     while (!accepted) {
+      clearScreen()
+      userPrint(board)
       userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
       userPrint(Console.RED + "Which Pokemon" + Console.RESET +
         "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
@@ -58,16 +69,20 @@ object CatFu {
         userPrint(Console.RED + (x + 1) + ":" + Console.RESET + playerList(x).name + " @ (" + playerList(x).posy + "," + playerList(x).posx + ")")
       }
       userPrint(Console.RED + "C" + Console.RESET + "ancel")
+      if (falseInput) {
+        userPrint("What? Please try it again and get your Cat away from your keyboard." +
+          "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
+        falseInput = false
+      }
       userinput() match {
         case x if playerList.indices contains (x.toInt - 1) =>
           index = x.toInt - 1
           accepted = true
-        case "C" | "c" => ()
-        case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
-          "It´s not a Game for cats. It´s a game about cats, buddy.")
+        case "C" | "c" => start()
+        case _ => falseInput = true
       }
     }
-    playerList(index)
+    if (index == -1) None else Some(playerList(index))
   }
 
   def actionmenu(player: Player): Unit = {
@@ -84,17 +99,14 @@ object CatFu {
       userPrint(Console.RED + "P" + Console.RESET + "et a cat.")
       readLine(">") match {
         case "M" | "m" =>
-          userPrint("Not yet implemented")
-          clearScreen()
           accepted = true
           move(player)
         case "A" | "a" =>
           userPrint("Not yet implemented")
-          clearScreen()
           accepted = true
         //attack(player)
         case "H" | "h" => help()
-        case "E" | "e" => System.exit(0)
+        case "E" | "e" => sys.exit(0)
         case _ | "P" | "p" => userPrint("What? Please try it again and get your Cat away from your keys." +
           "It´s not a Game for cats. It´s a game about cats, buddy.")
       }
@@ -147,12 +159,14 @@ object CatFu {
     userPrint("Do you want to")
     userPrint(Console.RED + "L" + Console.RESET + "oad a Character?")
     userPrint(Console.RED + "C" + Console.RESET + "reate a new Kitten?")
+    userPrint(Console.RED + "R" + Console.RESET + "emove a Kitten from your team?")
     userPrint(Console.RED + "G" + Console.RESET + "enerate a random Team?")
     userPrint(Console.RED + "S" + Console.RESET + "tart the game or")
     userPrint(Console.RED + "E" + Console.RESET + "xit while you still can?")
   }
 
   def loadMenu(): List[Player] = {
+    clearScreen()
     userPrint("Please tell me the kitten you want to load.")
     PlayerManagement.loadCharacter(userinput()) match {
       case Some(x) => List(x)
@@ -163,6 +177,7 @@ object CatFu {
   }
 
   def createMenu(): List[Player] = {
+    clearScreen()
     userPrint("What's the name of the new Kitty?")
     val name = userinput()
     userPrint("Is the new Feline a " + Console.RED + "P" + Console.RESET + "awrior or a " + Console.RED + "F" + Console.RESET + "leazard?")
@@ -175,22 +190,48 @@ object CatFu {
     }
   }
 
+  def removeFromList(list: List[Player]): List[Player] = {
+    clearScreen()
+    userPrint("Who do you want to remove?")
+    for (x: Int <- list.indices) {
+      userPrint(Console.RED + (x + 1) + ": " + Console.RESET + list(x).name)
+    }
+    userPrint(Console.RED + "C" + Console.RESET + "ancel")
+    userinput() match {
+      case x if list.indices contains (x.toInt - 1) =>
+        val (l1, l2) = list.splitAt(x.toInt - 1)
+        l1 ::: (l2 drop 1)
+      case "C" | "c" => list
+      case _ => userPrint("wrong input, cancelling")
+        list
+    }
+  }
+
+  // scalastyle:off
   def characterMenu(): List[Player] = {
     var list: List[Player] = List()
     var accepted = false
+    var falseInput = false
     while (!accepted) {
       clearScreen()
       printCharacterMenu(list)
+      if (falseInput) {
+        userPrint("What? I didn't get that.")
+        falseInput = false
+      }
       userinput() match {
         case "L" | "l" => list = list ++ loadMenu()
         case "C" | "c" => list = list ++ createMenu()
+        case "R" | "r" => list = removeFromList(list)
         case "G" | "g" => list = PlayerManagement.randomTeam()
         case "S" | "s" => if (list.nonEmpty && list.length < 5) accepted = true
         case "E" | "e" => sys.exit(0)
+        case _ => falseInput = true
       }
     }
     list
   }
+  // scalastyle:on
 
   def start(): Unit = {
     // Player management up to 4 ()
@@ -284,6 +325,7 @@ object CatFu {
     val list = field.dijkstra(p)
     println(field.highlight(list))
   }
+
   // scalastyle:on
 }
 

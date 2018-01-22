@@ -214,3 +214,29 @@ class Warrior(val name: String, override val color: String) extends Player() {
   def getSpeed: Int = speed
   override def toString: String = name + ", the level " + lvl + " Pawrior"
 }
+
+object NoPlayer extends Player {
+  override val name: String = ""
+  override var currentHP: Int = 0
+
+  override def getMaxHP: Int = 0
+
+  override def getAtt: Int = 0
+
+  override def getDef: Int = 0
+
+  override def getRange: Int = 0
+
+  override def getSpeed: Int = 0
+
+  /**
+   * Sets the character to the level and calculate the stat increase.
+   * The actual stat increase is role dependent so it's only abstract.
+   *
+   * @param level the level the character should be.
+   */
+  override def setLvl(level: Int): Unit = {}
+
+  override val display: Char = '\u0000'
+}
+
