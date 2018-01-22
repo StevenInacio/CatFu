@@ -22,8 +22,7 @@ object CatFu {
     userPrint(enemy.fullDescription)
 
   def main(args: Array[String]): Unit = {
-    testDijkstra()
-    /*menu()
+    menu()
 
     for (_ <- 0 until 10) {
       val result = student.attack(enemy)
@@ -56,7 +55,7 @@ object CatFu {
     userPrint(student.fullDescription)
     userPrint(enemy.fullDescription)
     userPrint(student.hitrate(enemy))
-    userPrint(enemy.hitrate(student))*/
+    userPrint(enemy.hitrate(student))
   }
 
   def userinput(): String = {
@@ -67,6 +66,9 @@ object CatFu {
   def gameProcess(): Unit = {
     val p :Player = playerChoose()
     actionmenu(p)
+
+
+
 
     var input = userinput()
 
@@ -80,7 +82,9 @@ object CatFu {
   }
 
   def move(p: Player): Unit ={
-    userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
+    val list = board.dijkstra(p)
+    println(board.highlight(list))
+    userPrint(Console.RED + "Please enter your way/ catjump. Possible Moves are shown." + Console.RESET + " compuurrrende?!")
     var intsteps = board.isvalid(p,userinput(),p.getSpeed)
     if (intsteps > 0){
       actionmenu(p)
@@ -259,21 +263,6 @@ object CatFu {
     userPrint("\u001b[H\u001b[J")
   }
 
-  def testDijkstra() : Unit = {
-    val field = new Field
-    field.clearField()
-    field.setPosition(Obstacle(), 2, 4)
-    field.setPosition(Obstacle(), 3, 3)
-    field.setPosition(Obstacle(), 3, 6)
-    field.setPosition(Obstacle(), 1, 5)
-    val p = new Mage("Peter", Console.GREEN)
-    field.setPosition(p, 3, 4)
-    p.posx = 3
-    p.posy = 4
-    val
-    list = field.dijkstra(p)
-    println(field.highlight(list))
-  }
 }
 
 //undo should get a "last called function" but then turn parameters around accordingly.
