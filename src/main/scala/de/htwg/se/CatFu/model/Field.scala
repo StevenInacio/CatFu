@@ -14,7 +14,7 @@ class Field {
    * Fills the Field with empty Things
    */
   def clearField(): Unit = {
-    var empty = Empty()
+    var empty = Empty(Console.WHITE)
     field = Array.ofDim[Thing](xfield, yfield)
     for (i <- 0 until xfield) {
       for (j <- 0 until yfield) {
@@ -28,7 +28,7 @@ class Field {
    * @return s a String
    */
   override def toString: String = {
-    val empty = Empty()
+    val empty = Empty(Console.WHITE)
     val rock = new Obstacle
     val reset = Console.RESET
     var s: String = ""
@@ -148,6 +148,13 @@ class Field {
     case 's' if (p.posy + 1 < yfield && p.posy + 1 >= 0) && field(p.posx)(p.posy + 1).isInstanceOf[Empty] => true
     case _ => false
   }
+  def matchTestValidInputSpace(x : (Int,Int) , i: Char): Boolean = i match {
+    case 'a' if (x._2 - 1 < yfield && x._2 - 1 >= 0) && field(x._1)(x._2 - 1).isInstanceOf[Empty] => true
+    case 'w' if (x._1 - 1 < xfield && x._1 - 1 >= 0) && field(x._1 - 1)(x._2).isInstanceOf[Empty] => true
+    case 'd' if (x._1 + 1 < xfield && x._1 + 1 >= 0) && field(x._1 + 1)(x._2).isInstanceOf[Empty] => true
+    case 's' if (x._2 + 1 < yfield && x._2 + 1 >= 0) && field(x._1)(x._2 + 1).isInstanceOf[Empty] => true
+    case _ => false
+  }
 
   /**
    * Moves a Thing <br>
@@ -167,7 +174,7 @@ class Field {
    */
   // verknüpfen mit move2 weil das eine liste erstellt
   def realmove(p: Player, input: Char): Boolean = { // unbedingt clear zuerst
-    val empty = Empty()
+    val empty = Empty(Console.WHITE)
 
     if (input == 'a') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
@@ -198,11 +205,95 @@ class Field {
    * @param end is a Player
    * @return the Distance in int
    */
-  def getDistance(start: Player, end: Player): Int = {
+  def getDistance(start: Player, end: Player): Int = { //OHne Rocks zu beabsichtigen
     val x = start.posx - end.posx
     val y = start.posy - end.posy
     x + y
   }
+
+  def getRange(start: Player, end: Player): Int = {
+    42
+  }
+
+  /*def showPossibleMoves(p : Player): Unit = {
+    var steps = p.getSpeed
+    val awsd: List[Char] = List('a', 'w', 's', 'd')
+    var l: Char = ' '
+    var x = p.posx
+    var y = p.posy
+    for (i <- 0 until (steps^2) +1) {
+      for (j <- 0 until 4) {
+
+
+        if (matchTestValidInputSpace(p, l=awsd(j))) {
+          print()
+              field(x)(y) == Empty(Console.MAGENTA_B)
+        }
+      }
+
+    }
+  }*/
+
+  def dijkstra(p: Player) : List[(Int,Int)] = {
+    var map: Map[(Int,Int),Boolean] = Map((p.posx, p.posy) -> false)
+
+    for (i <- 0 until p.getSpeed) {
+      for (x <- map.filter((t) => !t._2).keys) {
+        if (matchTestValidInputSpace((x._1, x._2), 'w')) {
+          map = map ++ Map((x._1 - 1, x._2) -> false)
+        }
+        if (matchTestValidInputSpace((x._1, x._2), 'a')) {
+          map = map ++ Map((x._1, x._2 - 1) -> false)
+        }
+        if (matchTestValidInputSpace((x._1, x._2), 's')) {
+          map = map ++ Map((x._1 + 1, x._2) -> false)
+        }
+        if (matchTestValidInputSpace((x._1, x._2), 'd')) {
+          map = map ++ Map((x._1, x._2 + 1) -> false)
+        }
+        map = map.updated(x, true)
+      }
+    }
+    map.keys.toList
+  }
+
+  def highlight(list: List[(Int,Int)]) : String = {
+    val empty = Empty(Console.WHITE)
+    val rock = new Obstacle
+    val reset = Console.RESET
+    var s: String = ""
+    var vertical = "----"
+    vertical = (vertical * yfield) + "-"
+    for (i <- 0 until xfield) { // to -1
+      if (i > 0) { s += "|" }
+      s += "\n" + vertical + "\n"
+      for (j <- 0 until yfield) { // to -1
+        val thing: Thing = field(i)(j)
+        if (list.contains((i,j))) {
+          if (thing == empty) {
+            s += "|" + Console.MAGENTA_B + "   " + reset
+          } else if (thing == rock) {
+            s += "| " + Console.MAGENTA_B + rock.color + rock.display + reset + " "
+          } else {
+            s += "| " + Console.MAGENTA_B + thing.color + thing.display + reset + " "
+          }
+        }
+        else {
+          if (thing == empty) {
+            s += "|   "
+          } else if (thing == rock) {
+            s += "| " + rock.color + rock.display + reset + " "
+          } else {
+            s += "| " + thing.color + thing.display + reset + " "
+          }
+        }
+      }
+    }
+    s += "|\n" + vertical
+    s
+  }
+
+
 
   /*
     var newx = 0

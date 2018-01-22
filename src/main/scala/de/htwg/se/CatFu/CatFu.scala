@@ -22,8 +22,8 @@ object CatFu {
     userPrint(enemy.fullDescription)
 
   def main(args: Array[String]): Unit = {
-
-    menu()
+    testDijkstra()
+    /*menu()
 
     for (_ <- 0 until 10) {
       val result = student.attack(enemy)
@@ -56,7 +56,7 @@ object CatFu {
     userPrint(student.fullDescription)
     userPrint(enemy.fullDescription)
     userPrint(student.hitrate(enemy))
-    userPrint(enemy.hitrate(student))
+    userPrint(enemy.hitrate(student))*/
   }
 
   def userinput(): String = {
@@ -257,6 +257,19 @@ object CatFu {
     userPrint()
     readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + " to continue.")
     userPrint("\u001b[H\u001b[J")
+  }
+
+  def testDijkstra() : Unit = {
+    val field = new Field
+    field.clearField()
+    field.setPosition(Obstacle(), 3, 3)
+    val p = new Mage("Peter", Console.GREEN)
+    field.setPosition(p, 3, 4)
+    p.posx = 3
+    p.posy = 4
+    val
+    list = field.dijkstra(p)
+    println(field.highlight(list))
   }
 }
 
