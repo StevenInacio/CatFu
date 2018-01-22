@@ -262,7 +262,10 @@ object CatFu {
   def testDijkstra() : Unit = {
     val field = new Field
     field.clearField()
+    field.setPosition(Obstacle(), 2, 4)
     field.setPosition(Obstacle(), 3, 3)
+    field.setPosition(Obstacle(), 3, 6)
+    field.setPosition(Obstacle(), 1, 5)
     val p = new Mage("Peter", Console.GREEN)
     field.setPosition(p, 3, 4)
     p.posx = 3
