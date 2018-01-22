@@ -1,7 +1,7 @@
 name          := "CatFu"
 organization  := "de.htwg.se"
 version       := "0.0.1"
-scalaVersion  := "2.11.8"
+scalaVersion  in ThisBuild := "2.11.8"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
 resolvers += Resolver.jcenterRepo
@@ -17,6 +17,7 @@ libraryDependencies ++= {
 
 libraryDependencies += "junit" % "junit" % "4.8" % "test"
 
+ensimeScalaVersion in ThisBuild := "2.11.8"
 
 fork in run := false
 connectInput in run := true
