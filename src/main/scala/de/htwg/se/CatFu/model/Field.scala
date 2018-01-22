@@ -4,8 +4,8 @@ import de.htwg.se.CatFu.model._
 
 class Field {
   var inputlength = 0
-  var xfield: Int = 7
-  var yfield: Int = 7
+  val xfield: Int = 7
+  val yfield: Int = 7
   var xold: Int = 0
   var yold: Int = 0
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
@@ -14,7 +14,7 @@ class Field {
    * Fills the Field with empty Things
    */
   def clearField(): Unit = {
-    var empty = Empty()
+    val empty = Empty()
     field = Array.ofDim[Thing](xfield, yfield)
     for (i <- 0 until xfield) {
       for (j <- 0 until yfield) {
@@ -81,14 +81,14 @@ class Field {
    */
   def fillrandomField(): Unit = {
     val random = new scala.util.Random
-    var rock = new Obstacle
+    val rock = new Obstacle
     var p = 0
     if (yfield > xfield) {
       p = xfield
     } else { p = yfield }
     for (_ <- 0 to p) { // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
-      var r1 = random.nextInt(xfield)
-      var r2 = random.nextInt(yfield)
+      val r1 = random.nextInt(xfield)
+      val r2 = random.nextInt(yfield)
       field(r1)(r2) = rock
     }
   }
@@ -116,6 +116,7 @@ class Field {
         if (!matchTestValidInputSpace(p, userinput.charAt(i))) {
           p.posx = xold
           p.posy = yold
+          //noinspection ScalaStyle
           return false
         } else {
           inputlength += 1
@@ -124,7 +125,6 @@ class Field {
           realmove(p, userinput.charAt(i))
         }
       }
-      val inputList = input.toList
       true
     }
   }
@@ -138,7 +138,7 @@ class Field {
    * @param i Char
    * @return just a Checkbool
    */
-
+  // scalastyle:off
   def matchTestValidInputSpace(p: Player, i: Char): Boolean = i match {
     case 'a' if (p.posy - 1 < yfield && p.posy - 1 >= 0) && field(p.posx)(p.posy - 1).isInstanceOf[Empty] => true
     case 'w' if (p.posx - 1 < xfield && p.posx - 1 >= 0) && field(p.posx - 1)(p.posy).isInstanceOf[Empty] => true
@@ -146,7 +146,7 @@ class Field {
     case 's' if (p.posy + 1 < yfield && p.posy + 1 >= 0) && field(p.posx)(p.posy + 1).isInstanceOf[Empty] => true
     case _ => false
   }
-
+  // scalastyle:on
   /**
    * Moves a Thing <br>
    * @param t Thing. Can be Player or Empty

@@ -15,6 +15,8 @@ libraryDependencies ++= {
   )
 }
 
+ensimeScalaVersion in ThisBuild := "2.11.8"
+
 libraryDependencies += "junit" % "junit" % "4.8" % "test"
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.7"
 

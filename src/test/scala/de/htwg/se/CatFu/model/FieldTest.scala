@@ -17,7 +17,7 @@ class FieldTest extends WordSpec with Matchers {
     "be level 1" in {
       player.lvl should be (1)
     }
-  }}
+  }}/*
   "A Move" when {
     "valid" should {
       val field: Field = new Field
@@ -25,10 +25,6 @@ class FieldTest extends WordSpec with Matchers {
 
       }
     }
-  }
-
-
-
-
+  }*/
 
 }

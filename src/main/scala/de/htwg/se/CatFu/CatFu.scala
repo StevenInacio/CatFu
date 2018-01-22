@@ -29,7 +29,7 @@ object CatFu {
     val list: List[Thing] = List(student, enemy, obs1)
     val playerList: List[Player] = List(student)
     val enemyList: List[Player] = List(enemy)
-    var board = new Field()
+    val board = new Field()
     board.clearField()
     board.fillrandomField() // set Obstacles
     board.setUpTeams(playerList, enemyList)
@@ -87,8 +87,6 @@ object CatFu {
 
   def start(): Unit = {
     // Player management up to 4 ()
-    val manager = PlayerManagement
-
     // Load Players
     // Create Players // make a Player Factory?
     // remove Players
