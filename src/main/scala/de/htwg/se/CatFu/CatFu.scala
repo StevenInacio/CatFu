@@ -25,35 +25,18 @@ object CatFu {
   }
 
   def gameProcess(): Unit = {
-    userPrint(board)
-    var accepted = false
-    var p: Player = NoPlayer
-    while (!accepted) {
-      val result = playerChoose()
-      result match {
-        case Some(x) =>
-          p = x
-          accepted = true
-        case None => userPrint("There was an Error.")
-      }
-    }
-    actionmenu(p)
+
   }
 
-  def move(p: Player): Unit = {
+  def move(p: Player, remainingMoves: Int): Int = {
     clearScreen()
     userPrint(board.highlight(board.dijkstra(p)))
     userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
-    val intsteps = board.isvalid(p, userinput(), p.getSpeed)
-    if (intsteps > 0) {
-      actionmenu(p)
-    }
+    board.isValid(p, userinput(), remainingMoves)
   }
 
-  def playerChoose(): Option[Player] = {
-    //if(liste von charakter == 0) -> nehme den einen und geh gleich zu actionmenu
-    // ansonsten fragen, welchen er benutzen möchte:
-
+  // scalastyle:off
+  def playerChoose(playerMap: Map[Player, (Boolean, Boolean)]): Option[Player] = {
     var accepted = false
     var index = -1
     var falseInput = false
@@ -63,54 +46,69 @@ object CatFu {
       userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
       userPrint(Console.RED + "Which Pokemon" + Console.RESET +
         "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
-      //Liste von Charakter, die der User noch hat.
-      //Listen index dann eingeben???????? korrekt.
-      for (x: Int <- playerList.indices) {
-        userPrint(Console.RED + (x + 1) + ":" + Console.RESET + playerList(x).name + " @ (" + playerList(x).posy + "," + playerList(x).posx + ")")
+      for (x <- playerList.indices) {
+        if (!playerMap(playerList(x))._1) {
+          userPrint(Console.INVISIBLE + (x + 1) + ": " + playerList(x).name +
+            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + Console.RESET)
+        } else {
+          userPrint(Console.RED + (x + 1) + ": " + Console.RESET + playerList(x).name +
+            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")")
+        }
       }
-      userPrint(Console.RED + "C" + Console.RESET + "ancel")
+      userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
       if (falseInput) {
         userPrint("What? Please try it again and get your Cat away from your keyboard." +
           "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
         falseInput = false
       }
       userinput() match {
-        case x if playerList.indices contains (x.toInt - 1) =>
+        case x if playerList.indices.contains(x.toInt - 1) && playerMap(playerList(x.toInt - 1))._2 =>
           index = x.toInt - 1
           accepted = true
-        case "C" | "c" => start()
+        case "E" | "e" => accepted = true
         case _ => falseInput = true
       }
     }
     if (index == -1) None else Some(playerList(index))
   }
 
-  def actionmenu(player: Player): Unit = {
+  // scalastyle:on
+
+  def actionMenu(player: Player, map: Map[Player, (Boolean, Boolean)]): (Boolean, Boolean) = {
     clearScreen()
     var accepted = false
+    var remainingMoves = player.getSpeed
+    var movable = map(player)._2
+    var available = map(player)._1
     while (!accepted) {
       userPrint(board.highlight(player))
       userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
       userPrint("What do you want to do?")
-      userPrint(Console.RED + "M" + Console.RESET + "ove")
+      if (movable) {
+        userPrint(Console.RED + "M" + Console.RESET + "ove")
+      } else {
+        userPrint(Console.INVISIBLE + "Move" + Console.RESET)
+      }
       userPrint(Console.RED + "A" + Console.RESET + "ttack")
-      userPrint(Console.RED + "H" + Console.RESET + "ow To Play")
-      userPrint(Console.RED + "E" + Console.RESET + "xit")
-      userPrint(Console.RED + "P" + Console.RESET + "et a cat.")
+      userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
+      userPrint(Console.RED + "C" + Console.RESET + "ancel")
       readLine(">") match {
-        case "M" | "m" =>
-          accepted = true
-          move(player)
+        case "M" | "m" if movable =>
+          remainingMoves -= move(player, remainingMoves)
+          if (0 == remainingMoves) movable = false
         case "A" | "a" =>
           userPrint("Not yet implemented")
           accepted = true
-        //attack(player)
-        case "H" | "h" => help()
-        case "E" | "e" => sys.exit(0)
-        case _ | "P" | "p" => userPrint("What? Please try it again and get your Cat away from your keys." +
+          available = false
+        //attackMenu(player)
+        case "E" | "e" => available = false
+          accepted = true
+        case "C" | "c" => accepted = true
+        case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
           "It´s not a Game for cats. It´s a game about cats, buddy.")
       }
     }
+    available -> movable
   }
 
   def menu(): Unit = {
@@ -232,6 +230,7 @@ object CatFu {
     }
     list
   }
+
   // scalastyle:on
 
   def start(): Unit = {
@@ -242,20 +241,16 @@ object CatFu {
     board.fillrandomField() // set Obstacles
     board.setUpTeams(playerList, enemyList)
     userPrint(board)
-    gameProcess()
-    // Load Players
-    // Create Players // make a Player Factory?
-    // remove Players
-    // Start Game
-    // Generate 3-4 Random Enemies split playergroup total level among them
-    // Enemy Factory. Abstract or Method Combine with Player?
-    // prepare Board
-    // spawn it in
-    // set Obstacles
-    // set Enemies to random upper locations
-    // let Players decide where to place their pawns?
-    // need a menu for that.
-    // show Board and Controls on Screen
+    playerTurn()
+
+    // Generate 3-4 Random Enemies split playergroup total level among them [+] done
+    // Enemy Factory. Abstract or Method Combine with Player? [+] done
+    // prepare Board [+] done
+    // spawn it in [+] done
+    // set Obstacles [+] done
+    // set Enemies to random upper locations [+] done
+    // let Players decide where to place their pawns? [-] scrapped
+    // show Board and Controls on Screen [+]
     /*val rand = new scala.util.Random
     rand.nextBoolean() match {
       case true => playerTurn()
@@ -265,14 +260,25 @@ object CatFu {
   }
 
   def playerTurn(): Unit = {
-    // map Actor to (bool, bool) ("available" and "movable")
-    // for (_ <- 0 until actorlist.length) {
-    // Show Options to Select available Actor or End Turn
-    // Handle Input
-    // if End Turn enemyTurn()
-    // else Show Actor Action Menu
-    // Handle Input
-    // move (grey out if movable == false)
+    var map: Map[Player, (Boolean, Boolean)] = Map()
+
+    playerList.foreach(p => map += p -> (true, true))
+
+    userPrint(board)
+    var accepted = false
+    var p: Player = NoPlayer
+    while (map.exists((t) => t._2._1)) {
+      while (!accepted) {
+        val result = playerChoose(map)
+        result match {
+          case Some(x) =>
+            p = x
+            map = map.updated(p, actionMenu(p, map))
+            accepted = true
+          case None => accepted
+        }
+      }
+    }
     // attack
     // legality check
     // pass:
@@ -283,7 +289,7 @@ object CatFu {
     // wait (immediately set available to false and continue)
     // cancel to previous menu
     // End Turn
-    menu()
+    enemyTurn()
   }
 
   def enemyTurn(): Unit = {
