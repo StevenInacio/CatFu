@@ -21,6 +21,21 @@ abstract case class Player() extends Thing {
   def getRange: Int
   def getSpeed: Int
 
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case player: Player =>
+        if ((name == player.name) && (posx == player.posx) && (posy == player.posy)) {
+          true
+        } else {
+          false
+        }
+      case _ =>
+        false
+    }
+  }
+
+  override def hashCode(): Int = super.hashCode() // scalastyle:¯\_(ツ)_/¯
+
   /**
    * Decrease this characters current HP. <br>
    * It ensures that the current HP is always between 0 and the max HP of this character.
