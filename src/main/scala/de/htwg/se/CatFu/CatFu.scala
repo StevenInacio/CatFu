@@ -202,7 +202,8 @@ object CatFu {
         val (l1, l2) = list.splitAt(x.toInt - 1)
         l1 ::: (l2 drop 1)
       case "C" | "c" => list
-      case _ => userPrint("wrong input, cancelling")
+      case _ =>
+        userPrint("wrong input, cancelling")
         list
     }
   }
