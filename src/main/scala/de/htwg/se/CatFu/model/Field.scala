@@ -3,11 +3,9 @@ package de.htwg.se.CatFu.model
 import de.htwg.se.CatFu.model._
 
 class Field {
-  var inputlength = 0
-  val xfield: Int = 7
-  val yfield: Int = 7
-  var xold: Int = 0
-  var yold: Int = 0
+  var stepsTaken = 0
+  val xfield: Int = 12
+  val yfield: Int = 12
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
 
   /**
@@ -92,43 +90,33 @@ class Field {
       field(r1)(r2) = rock
     }
   }
-
   /**
-   * Checks if Userinput is valid<br>
-   * goes to match
-   *   and move
-   * MAKES A LIST = IS NEEDED???????
-   * @param p Player
-   * @param userinput String
-   * @return inputlength is an Int that said how many steps Player did.
+   * Checks if the requested Steps are valid and moves when they are.
+   * @param p The moving Player.
+   * @param userInput String containing "WASD" to indicate the direction the player wants to go.
+   * @return The amount of steps the Player took, 0 if there was a Thing in the way.
    */
-  def isvalid(p: Player, userinput: String, intsteps: Int): Int = {
-    import scala.collection.mutable.ListBuffer
-    var remainingMoves = intsteps
-    inputlength = 0
-    xold = p.posx
-    yold = p.posy
-    println(userinput.length)
-    if (p.getSpeed < userinput.length) {
-      -1
-    } else {
-      var input = new ListBuffer[Char]()
-      for (i <- 0 until userinput.length) {
-        if (!matchTestValidInputSpace(p, userinput.charAt(i))) {
-          p.posx = xold
-          p.posy = yold
-          -2
+  def isValid(p: Player, userInput: String, intSteps: Int): Int = {
+    val xOld = p.posx
+    val yOld = p.posy
+    stepsTaken = 0
+    if (intSteps >= userInput.length) {
+      for (i <- 0 until userInput.length) {
+        if (!matchTestValidInputSpace(p, userInput.charAt(i))) {
+          val tempX = p.posx
+          val tempY = p.posx
+          setPosition(Empty(Console.WHITE), tempX, tempY)
+          p.posx = xOld
+          p.posy = yOld
+          setPosition(p, p.posx, p.posy)
+          stepsTaken = 0
         } else {
-          inputlength += 1
-          input += userinput.charAt(i)
-          print(userinput.charAt(i))
-          realmove(p, userinput.charAt(i))
+          stepsTaken += 1
+          realmove(p, userInput.charAt(i))
         }
       }
-      val inputList = input.toList
-      remainingMoves = inputlength
-      inputlength
     }
+    stepsTaken
   }
 
   /**

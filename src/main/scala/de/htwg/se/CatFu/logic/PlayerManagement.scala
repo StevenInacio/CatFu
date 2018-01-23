@@ -10,7 +10,7 @@ object PlayerManagement {
   val names = List("Lucifurr", "Catmando", "Findus", "Jenifurr", "Flease Witherspoon", "Whispurr", "Cat Damon",
     "David Meowie", "Fuzz Aldrin", "Jude Paw", "Meowses", "Oedipuss", "Catzilla", "Fuzzinator", "iCat", "Kitkat",
     "Miraclaw", "Octopuss", "Wigglebutt", "Flufferton", "Giggles", "Nacho", "Purrgatory", "Schrödinger", "Tempurra",
-    "She-ra", "Puma Thurman", "Garfield", "He-Man", "Mr. Bigglesworth", "Shakespurr")
+    "She-ra", "Puma Thurman", "Garfield", "He-Man", "Mr. Bigglesworth", "Shakespurr", "Rwarbo", "Nyancat", "Grumpy Cat")
 
   def randomTeam(): List[Player] = {
     val random = scala.util.Random
@@ -30,10 +30,11 @@ object PlayerManagement {
     for (x <- list) {
       level += x.lvl
     }
-    level = level / list.length
     var enemy: List[Player] = List()
     val random = scala.util.Random
-    for (_ <- 0 until 4) { // scalastyle:ignore
+    val enemyAmount = random.nextInt(2) + 3
+    level = level / enemyAmount
+    for (_ <- 0 until enemyAmount) { // scalastyle:ignore
       enemy ++= List(createEnemy(names(random.nextInt(names.length)), level))
     }
     enemy
