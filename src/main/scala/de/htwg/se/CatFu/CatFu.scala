@@ -36,7 +36,7 @@ object CatFu {
   }
 
   // scalastyle:off
-  def playerChoose(playerMap: Map[Player, (Boolean, Boolean)]): Option[Player] = {
+  def playerChoose(playerMap: Map[Int, (Boolean, Boolean)]): Option[Player] = {
     var accepted = false
     var index = -1
     var falseInput = false
@@ -47,7 +47,7 @@ object CatFu {
       userPrint(Console.RED + "Which Pokemon" + Console.RESET +
         "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
       for (x <- playerList.indices) {
-        if (!playerMap(playerList(x))._1) {
+        if (!playerMap(x)._1) {
           userPrint(Console.INVISIBLE + (x + 1) + ": " + playerList(x).name +
             " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + Console.RESET)
         } else {
@@ -61,12 +61,16 @@ object CatFu {
           "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
         falseInput = false
       }
-      userinput() match {
-        case x if playerList.indices.contains(x.toInt - 1) && playerMap(playerList(x.toInt - 1))._2 =>
-          index = x.toInt - 1
-          accepted = true
-        case "E" | "e" => accepted = true
-        case _ => falseInput = true
+      try {
+        userinput() match {
+          case "E" | "e" => accepted = true
+          case x if playerList.indices.contains(x.toInt - 1) && playerMap(x.toInt - 1)._2 =>
+            index = x.toInt - 1
+            accepted = true
+          case _ => falseInput = true
+        }
+      } catch {
+        case _: NumberFormatException => falseInput = true
       }
     }
     if (index == -1) None else Some(playerList(index))
@@ -74,12 +78,12 @@ object CatFu {
 
   // scalastyle:on
 
-  def actionMenu(player: Player, map: Map[Player, (Boolean, Boolean)]): (Boolean, Boolean) = {
+  def actionMenu(player: Player, map: Map[Int, (Boolean, Boolean)]): (Boolean, Boolean) = {
     clearScreen()
     var accepted = false
     var remainingMoves = player.getSpeed
-    var movable = map(player)._2
-    var available = map(player)._1
+    var movable = map(playerList.indexOf(player))._2
+    var available = map(playerList.indexOf(player))._1
     while (!accepted) {
       userPrint(board.highlight(player))
       userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
@@ -101,7 +105,8 @@ object CatFu {
           accepted = true
           available = false
         //attackMenu(player)
-        case "E" | "e" => available = false
+        case "E" | "e" =>
+          available = false
           accepted = true
         case "C" | "c" => accepted = true
         case _ => userPrint("What? Please try it again and get your Cat away from your keys." +
@@ -260,20 +265,16 @@ object CatFu {
   }
 
   def playerTurn(): Unit = {
-    var map: Map[Player, (Boolean, Boolean)] = Map()
-
-    playerList.foreach(p => map += p -> (true, true))
-
+    var map: Map[Int, (Boolean, Boolean)] = Map()
+    playerList.indices.foreach(p => map = map + (p -> (true, true)))
     userPrint(board)
-    var accepted = false
-    var p: Player = NoPlayer
     while (map.exists((t) => t._2._1)) {
+      var accepted = false
       while (!accepted) {
         val result = playerChoose(map)
         result match {
           case Some(x) =>
-            p = x
-            map = map.updated(p, actionMenu(p, map))
+            map = map.updated(playerList.indexOf(x), actionMenu(x, map))
             accepted = true
           case None => accepted
         }
