@@ -1,12 +1,14 @@
 package de.htwg.se.CatFu
 
-import de.htwg.se.CatFu.CatFu.start
+
 import de.htwg.se.CatFu.model._
 import de.htwg.se.CatFu.logic._
 
 import scala.io.StdIn.readLine
-
+import de.htwg.se.CatFu.aview._
 object CatFu {
+
+  val gui = new CatFuGUI()
 
   var counter: Int = 0
 
@@ -16,7 +18,8 @@ object CatFu {
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-    menu()
+
+    //menu()
   }
 
   def userinput(): String = {
