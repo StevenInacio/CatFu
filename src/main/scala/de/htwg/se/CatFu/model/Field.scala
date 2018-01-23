@@ -9,8 +9,8 @@ class Field {
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
 
   /**
-   * Fills the Field with empty Things
-   */
+    * Fills the Field with empty Things
+    */
   def clearField(): Unit = {
     val empty = Empty(Console.WHITE)
     field = Array.ofDim[Thing](xfield, yfield)
@@ -20,11 +20,12 @@ class Field {
       }
     }
   }
+
   /**
-   * ToString TUI <br>
-   * Prints the field
-   * @return s a String
-   */
+    * ToString TUI <br>
+    * Prints the field
+    * @return s a String
+    */
   override def toString: String = {
     val empty = Empty(Console.WHITE)
     val rock = new Obstacle
@@ -33,7 +34,9 @@ class Field {
     var vertical = "----"
     vertical = (vertical * yfield) + "-"
     for (i <- 0 until xfield) { // to -1
-      if (i > 0) { s += "|" }
+      if (i > 0) {
+        s += "|"
+      }
       s += "\n" + vertical + "\n"
       for (j <- 0 until yfield) { // to -1
         val thing: Thing = field(i)(j)
@@ -51,11 +54,12 @@ class Field {
   }
 
   /**
-   * Sets Random the Players<br>
-   *   At the beginning the game.
-   * @param enemy Team at the top of the field.
-   * @param player Team at the bottom of the field.
-   */
+    * Sets Random the Players<br>
+    * At the beginning the game.
+    *
+    * @param enemy  Team at the top of the field.
+    * @param player Team at the bottom of the field.
+    */
   def setUpTeams(player: List[Player], enemy: List[Player]): Unit = {
     val random = new scala.util.Random
     for (s <- player) {
@@ -73,29 +77,34 @@ class Field {
       s.posy = y
     }
   }
+
   /**
-   * Sets Obstacles on random Positions<br>
-   *   in the Field
-   */
+    * Sets Obstacles on random Positions<br>
+    * in the Field
+    */
   def fillrandomField(): Unit = {
     val random = new scala.util.Random
     val rock = new Obstacle
     var p = 0
     if (yfield > xfield) {
       p = xfield
-    } else { p = yfield }
+    } else {
+      p = yfield
+    }
     for (_ <- 0 to p) { // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
       val r1 = random.nextInt(xfield)
       val r2 = random.nextInt(yfield)
       field(r1)(r2) = rock
     }
   }
+
   /**
-   * Checks if the requested Steps are valid and moves when they are.
-   * @param p The moving Player.
-   * @param userInput String containing "WASD" to indicate the direction the player wants to go.
-   * @return The amount of steps the Player took, 0 if there was a Thing in the way.
-   */
+    * Checks if the requested Steps are valid and moves when they are.
+    *
+    * @param p         The moving Player.
+    * @param userInput String containing "WASD" to indicate the direction the player wants to go.
+    * @return The amount of steps the Player took, 0 if there was a Thing in the way.
+    */
   def isValid(p: Player, userInput: String, intSteps: Int): Int = {
     val xOld = p.posx
     val yOld = p.posy
@@ -120,14 +129,15 @@ class Field {
   }
 
   /**
-   * Matches<br>
-   * single Char after wasd
-   * and even in the field
-   * and if the next field is empty
-   * @param p Player
-   * @param i Char
-   * @return just a Checkbool
-   */
+    * Matches<br>
+    * single Char after wasd
+    * and even in the field
+    * and if the next field is empty
+    *
+    * @param p Player
+    * @param i Char
+    * @return just a Checkbool
+    */
   // scalastyle:off
   def matchTestValidInputSpace(p: Player, i: Char): Boolean = {
     matchTestValidInputSpace((p.posx, p.posy), i)
@@ -140,24 +150,39 @@ class Field {
     case 'd' if (x._2 + 1 < yfield && x._2 + 1 >= 0) && field(x._1)(x._2 + 1).isInstanceOf[Empty] => true
     case _ => false
   }
-  // scalastyle:on
 
+  def matchTestIsInField(p: Player, i: Char): Boolean = {
+    matchTestIsInField((p.posx, p.posy), i)
+  }
+
+  def matchTestIsInField(x: (Int, Int), i: Char): Boolean = i match {
+    case 'a' if x._2 - 1 < yfield && x._2 - 1 >= 0 => true
+    case 'w' if x._1 - 1 < xfield && x._1 - 1 >= 0 => true
+    case 's' if x._1 + 1 < xfield && x._1 + 1 >= 0 => true
+    case 'd' if x._2 + 1 < yfield && x._2 + 1 >= 0 => true
+    case _ => false
+  }
+
+  // scalastyle:on
   /**
-   * Moves a Thing <br>
-   * @param t Thing. Can be Player or Empty
-   * @param xnew New x position
-   * @param ynew New y position
-   */
+    * Moves a Thing <br>
+    *
+    * @param t    Thing. Can be Player or Empty
+    * @param xnew New x position
+    * @param ynew New y position
+    */
   def setPosition(t: Thing, xnew: Int, ynew: Int): Unit = {
     field(xnew)(ynew) = t
   }
+
   /**
-   * Moves the Player <br>
-   * And set the old Place to empty.
-   * @param input is a Char from the userinput, that were checked of valid from the method isvalid
-   * @param p is the Thing that will be moved.
-   * @return just a Checkbool
-   */
+    * Moves the Player <br>
+    * And set the old Place to empty.
+    *
+    * @param input is a Char from the userinput, that were checked of valid from the method isvalid
+    * @param p     is the Thing that will be moved.
+    * @return just a Checkbool
+    */
   // verknüpfen mit move2 weil das eine liste erstellt
   def realmove(p: Player, input: Char): Boolean = { // unbedingt clear zuerst
     val empty = Empty(Console.WHITE)
@@ -186,20 +211,78 @@ class Field {
   }
 
   /**
-   * Calculate the Distance between two Players
-   * @param start is a Player
-   * @param end is a Player
-   * @return the Distance in int
-   */
+    * Calculate the Distance between two Players
+    *
+    * @param start is a Player
+    * @param end   is a Player
+    * @return the Distance in int
+    */
   def getDistance(start: Player, end: Player): Int = { //OHne Rocks zu beabsichtigen
     val x = start.posx - end.posx
     val y = start.posy - end.posy
     x + y
   }
 
-  def getRange(start: Player, end: Player): Int = {
-    42
+  /**
+    * Calculate the MINIMUM Distance between two Players
+    *
+    * @param me is a Player
+    * @param pl is the Enemy Player List
+    * @return the Enemy with th min Distance
+    */
+  def getMinDistancetonextPlayer(me: Player, pl: List[Player]): Player = {
+    var min = 0
+    var tmp = 0
+    var minDisPly = me
+    for (p <- pl) {
+      tmp = getDistance(me, p)
+      if (min >= tmp) {
+        min = tmp
+        minDisPly = p
+      }
+
+    }
+    minDisPly
   }
+
+  def getRange(start: Player, enemies: List[Player]): List[Player] = {
+    enemies
+  }
+
+  // scalastyle:off
+  def dijkstraShowEnemiesInSpeed(p: Player, enemies: List[Player]): List[Player] = {
+    var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
+    var foundEnemies: List[Player] = List[Player]()
+    for (i <- 0 until p.getSpeed) {
+      for (x <- map.filter((t) => !t._2).keys) {
+        if (!matchTestValidInputSpace((x._1, x._2), 'w') && matchTestIsInField((x._1, x._2), 'w')) {
+
+          if ( enemies.contains(field(x._1 - 1)(x._2))) {
+
+            foundEnemies = foundEnemies :+ field(xfield)(yfield).asInstanceOf[Player]
+
+            map = map ++ Map((x._1 - 1, x._2) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 'a') && matchTestIsInField((x._1, x._2), 'a')) {
+            map = map ++ Map((x._1, x._2 - 1) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 's') && matchTestIsInField((x._1, x._2), 's')) {
+            map = map ++ Map((x._1 + 1, x._2) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 'd') && matchTestIsInField((x._1, x._2), 'd')) {
+            map = map ++ Map((x._1, x._2 + 1) -> false)
+          }
+          map = map.updated(x, true)
+        }
+      }
+      map.keys.toList
+
+    }
+
+    foundEnemies
+  }
+
+  // scalastyle:on
 
   /*def showPossibleMoves(p : Player): Unit = {
     var steps = p.getSpeed
@@ -255,7 +338,9 @@ class Field {
     var vertical = "----"
     vertical = (vertical * yfield) + "-"
     for (i <- 0 until xfield) { // to -1
-      if (i > 0) { s += "|" }
+      if (i > 0) {
+        s += "|"
+      }
       s += "\n" + vertical + "\n"
       for (j <- 0 until yfield) { // to -1
         val thing: Thing = field(i)(j)

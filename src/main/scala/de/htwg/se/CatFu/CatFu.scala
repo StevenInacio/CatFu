@@ -16,7 +16,8 @@ object CatFu {
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-    menu()
+
+   menu()
   }
 
   def userinput(): String = {
@@ -62,10 +63,10 @@ object CatFu {
         falseInput = false
       }
       userinput() match {
-        case x if playerList.indices.contains(x.toInt - 1) && playerMap(playerList(x.toInt - 1))._2 =>
+        case "E" | "e" => accepted = true
+        case x if playerList.indices contains (x.toInt - 1) =>
           index = x.toInt - 1
           accepted = true
-        case "E" | "e" => accepted = true
         case _ => falseInput = true
       }
     }
@@ -331,6 +332,21 @@ object CatFu {
     p.posy = 4
     val list = field.dijkstra(p)
     println(field.highlight(list))
+  }
+
+  def testDijkstra2(): Unit = {
+
+    board.clearField()
+    board.setPosition(Obstacle(), 2, 4)
+    board.setPosition(Obstacle(), 3, 3)
+    board.setPosition(Obstacle(), 3, 6)
+    board.setPosition(Obstacle(), 1, 5)
+    val p = new Mage("Peter", Console.GREEN)
+    board.setPosition(p, 3, 4)
+    p.posx = 3
+    p.posy = 4
+    val list = board.dijkstraShowEnemiesInSpeed(p,enemyList)
+    println(" hmmmmmmmmm" + list)
   }
 
   // scalastyle:on

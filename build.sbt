@@ -6,6 +6,7 @@ scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf
 
 resolvers += Resolver.jcenterRepo
 
+
 libraryDependencies ++= {
   val scalaTestV       = "3.0.1"
   val scalaMockV       = "3.2.2"
@@ -18,6 +19,7 @@ libraryDependencies ++= {
 }
 
 libraryDependencies += "junit" % "junit" % "4.8" % "test"
+
 
 fork in run := false
 connectInput in run := true
