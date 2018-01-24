@@ -5,6 +5,8 @@ class Field {
   val xfield: Int = 12
   val yfield: Int = 12
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
+  val empty = Empty(Console.WHITE)
+  val rock = Obstacle()
 
   // scalastyle:off
   def findWay(player: Player, target: Player): String = {
@@ -18,16 +20,87 @@ class Field {
     var directx = x - x_1
     var directy = y - y_1
     var vert = true
-    while (directx.abs == 1 && directy == 0 || directx == 0 && directy.abs == 1) {
+
+    var errorCount = 0
+    while (!((directx.abs == 1 && directy == 0) || (directx == 0 && directy.abs == 1))) {
       vert match {
+        case v if errorCount > 2 =>
+          if (v) {
+            if (matchTestValidInputSpace(x -> y, 'w')) {
+              if (s.nonEmpty) if (s.last == 's'){
+                s = s.slice(0, s.length - 1)
+              }
+              else {
+                s += 'w'
+                errorCount -= 1
+              }
+              directx -= 1
+              x -= 1
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
+              if(errorCount <= 2) vert = !vert
+            }
+            else if (matchTestValidInputSpace(x -> y, 's')) {
+              if (s.nonEmpty) if (s.last == 'w') s = s.slice(0, s.length - 1)
+              else {
+                s += 's'
+                errorCount -= 1
+              }
+              directx += 1
+              x += 1
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
+              if(errorCount <= 2) vert = !vert
+            }
+            else {
+              errorCount += 1
+              vert = !vert
+            }
+          } else {
+            if (matchTestValidInputSpace(x -> y, 'a')) {
+              if (s.nonEmpty) if (s.last == 'd') s = s.slice(0,s.length - 1)
+              else {
+                s += 'a'
+                errorCount -= 1
+              }
+              directy -= 1
+              y -= 1
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
+              if(errorCount <= 2) vert = !vert
+            }
+            else if (matchTestValidInputSpace(x -> y, 'd')) {
+              if (s.nonEmpty) if (s.last == 'a') {
+                s = s.slice(0,s.length - 1)
+
+              }
+              else {
+                s += 'd'
+                errorCount -= 1
+              }
+              directy += 1
+              y += 1
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
+              if(errorCount <= 2) vert = !vert
+            }
+            else {
+              errorCount += 1
+              vert = !vert
+            }
+          }
+          if (errorCount > 10 ){
+            s = ""
+            directx = 1
+            directy = 0
+          }
         case true if directx != 0 =>
           if (directx < 0) {
             if (matchTestValidInputSpace(x -> y, 's')) {
               s += 's'
               directx += 1
-              x -= 1
+              x += 1
+              errorCount = 0
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
             }
             else {
+              errorCount += 1
               vert = !vert
             }
           }
@@ -35,8 +108,11 @@ class Field {
             if (matchTestValidInputSpace(x -> y, 'w')) {
               s += 'w'
               directx -= 1
-              x += 1
+              x -= 1
+              errorCount = 0
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
             } else {
+              errorCount += 1
               vert = !vert
             }
           }
@@ -45,19 +121,31 @@ class Field {
             if (matchTestValidInputSpace(x -> y, 'd')) {
               s += 'd'
               directy += 1
-              y -= 1
+              y += 1
+              errorCount = 0
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
             }
-            else vert = !vert
+            else {
+              errorCount += 1
+              vert = !vert
+            }
           }
           else {
             if (matchTestValidInputSpace(x -> y, 'a')) {
               s += 'a'
               directy -= 1
-              y += 1
+              y -= 1
+              errorCount = 0
+              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
             }
-            else vert = !vert
+            else {
+              errorCount += 1
+              vert = !vert
+            }
           }
-        case _ => vert = !vert
+        case _ =>
+          errorCount += 1
+          vert = !vert
       }
     }
     s
@@ -145,7 +233,6 @@ class Field {
     */
   def setRandomObstacle(): Unit = {
     val random = new scala.util.Random
-    val rock = new Obstacle
     var p = 0
     if (yfield > xfield) {
       p = xfield
@@ -169,10 +256,8 @@ class Field {
     if (intSteps >= userInput.length) {
       for (i <- 0 until userInput.length) {
         if (!matchTestValidInputSpace(p, userInput.charAt(i))) {
-          setPosition(Empty(Console.WHITE), p.posx, p.posy)
-          p.posx = xOld
-          p.posy = yOld
-          setPosition(p, p.posx, p.posy)
+          setPosition(empty, p.posx, p.posy)
+          setPosition(p, xOld, yOld)
           stepsTaken = 0
         } else {
           stepsTaken += 1
@@ -227,6 +312,12 @@ class Field {
     * @param ynew New y position
     */
   def setPosition(t: Thing, xnew: Int, ynew: Int): Unit = {
+    t match {
+      case player: Player =>
+        player.posx = xnew
+        player.posy = ynew
+      case _ =>
+    }
     field(xnew)(ynew) = t
   }
 
@@ -240,27 +331,23 @@ class Field {
     */
   // verknüpfen mit move2 weil das eine liste erstellt
   def realmove(p: Player, input: Char): Boolean = { // unbedingt clear zuerst
-    val empty = Empty(Console.WHITE)
+
 
     if (input == 'a') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx, p.posy - 1) // SetPlayer
-      p.posy = p.posy - 1
     }
     if (input == 'w') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx - 1, p.posy) // SetPlayer
-      p.posx -= 1
     }
     if (input == 'd') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx, p.posy + 1) // SetPlayer
-      p.posy += 1
     }
     if (input == 's') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player
       setPosition(p, p.posx + 1, p.posy) // SetPlayer
-      p.posx += 1
     }
     true
   }
@@ -272,10 +359,10 @@ class Field {
     * @param end   is a Player
     * @return the Distance in int
     */
-  def getDistance(start: Player, end: Player): Int = { //OHne Rocks zu beabsichtigen
+  def getDistance(start: Player, end: Player): Int = { // Ohne Rocks zu beabsichtigen
     val x = start.posx - end.posx
     val y = start.posy - end.posy
-    x + y
+    x.abs + y.abs
   }
 
   /**
@@ -285,10 +372,10 @@ class Field {
     * @param pl is the Enemy Player List
     * @return the Enemy with th min Distance
     */
-  def getMinDistancetonextPlayer(me: Player, pl: List[Player]): Player = {
-    var min = 0
+  def getMinDistanceToNextPlayer(me: Player, pl: List[Player]): Player = {
+    var min = Int.MaxValue
     var tmp = 0
-    var minDisPly = me
+    var minDisPly: Player = NoPlayer
     for (p <- pl) {
       tmp = getDistance(me, p)
       if (min >= tmp) {
@@ -365,9 +452,8 @@ class Field {
   }
 
   def highlight(list: List[(Int, Int)]): String = {
-    val empty = Empty(Console.WHITE)
-    val rock = new Obstacle
     val reset = Console.RESET
+    val highlightColor = Console.BLUE_B
     var s: String = ""
     var vertical = "----"
     vertical = (vertical * yfield) + "-"
@@ -378,11 +464,11 @@ class Field {
         val thing: Thing = field(i)(j)
         if (list.contains((i, j))) {
           if (thing == empty) {
-            s += "|" + Console.MAGENTA_B + "   " + reset
+            s += "|" + highlightColor + "   " + reset
           } else if (thing == rock) {
-            s += "| " + Console.MAGENTA_B + rock.color + rock.display + reset + " "
+            s += "|" + highlightColor + " " + rock.display + " " + reset
           } else {
-            s += "| " + Console.MAGENTA_B + thing.color + thing.display + reset + " "
+            s += "|" + highlightColor + " " + thing.display + " " + reset
           }
         } else {
           if (thing == empty) {

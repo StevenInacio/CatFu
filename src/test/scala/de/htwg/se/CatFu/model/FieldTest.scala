@@ -1,5 +1,6 @@
 package de.htwg.se.CatFu.model
 
+import de.htwg.se.CatFu.logic._
 import org.scalatest._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -26,5 +27,16 @@ class FieldTest extends WordSpec with Matchers {
       }
     }
   }*/
+  "A Way" when {
+    "found" should {
+      "be not empty" in {
+        val board: Field = new Field()
+        board.clearField()
+        val player = PlayerManagement.createWarrior("Purrince", 1)
+        val enemy = PlayerManagement.createEnemy("Lucifurr", 1)
+        board.setPosition(player, 3, 2)
+      }
+    }
+  }
 
 }

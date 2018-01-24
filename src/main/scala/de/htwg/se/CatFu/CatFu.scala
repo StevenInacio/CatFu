@@ -340,9 +340,24 @@ object CatFu {
 
   def enemyTurn(): Unit = {
     for (x <- enemyList) {
-      val target = board.getMinDistancetonextPlayer(x, playerList)
-      val theWay: String = board.findWay(x, target).take(x.getSpeed)
-      //TODO: find de wae *cluck cluck cluck*
+      clearScreen()
+      userPrint(board.highlight(x))
+      val target = board.getMinDistanceToNextPlayer(x, playerList)
+      val distanceToTarget = board.getDistance(x, target)
+      if(distanceToTarget > x.getRange) {
+        val theWay = board.findWay(x, target).take(x.getSpeed).take(distanceToTarget - x.getRange)
+        board.isValid(x, theWay, x.getSpeed)
+      }
+      Thread.sleep(500) // scalastyle:ignore
+      if (board.getDistance(x, target) <= x.getRange) {
+        clearScreen()
+        x.attack(target)
+        userPrint(board.highlight(List((x.posx, x.posy), (target.posx, target.posy))))
+      }
+      else {
+        userPrint(board.highlight(x))
+      }
+      Thread.sleep(1000) // scalastyle:ignore
     }
     if (!playerList.exists(p => p.currentHP != 0)) defeat()
     playerTurn()
