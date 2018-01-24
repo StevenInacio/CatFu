@@ -31,12 +31,12 @@ class CatFuGUI extends Frame {
       var block = true
       contents += new Label("     ")
       for (i <- 0 until 12) {
-        for (k <- 0 until board.xfield) {
-          if (block) {
+        if (block) {
+          for (k <- 0 until board.xfield) {
             contents += new Label("  " + k + "  ")
           }
           block = false
-
+        }
           contents += new Label("  " + i + "  ")
           for (j <- 0 until board.yfield) {
             foreground = Color.blue
@@ -49,17 +49,10 @@ class CatFuGUI extends Frame {
               foreground = Color.black
               val figure: String = board.getDisplay(i, j).toString
               text = figure
-            }
-            //i ist x ist zeile
-            //j = y = spalte
-          }
-        }
-      }
+            }// button end
+          }// for j
+      }// i for 12
       repaint()
-
-
-    }, l = BorderPanel.Position.Center)
-
-
-  }
-}
+    }, l = BorderPanel.Position.Center) //gridpanel end
+  }//borderpanel end
+}//Catgui end
