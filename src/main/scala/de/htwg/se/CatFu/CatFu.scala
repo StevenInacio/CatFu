@@ -246,7 +246,7 @@ object CatFu {
     playerList = characterMenu()
     enemyList = PlayerManagement.enemyTeam(playerList)
     board.clearField()
-    board.fillrandomField() // set Obstacles
+    board.setRandomObstacle() // set Obstacles
     board.setUpTeams(playerList, enemyList)
     userPrint(board)
     playerTurn()
