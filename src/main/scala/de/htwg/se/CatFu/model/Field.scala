@@ -9,8 +9,8 @@ class Field {
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
 
   /**
-   * Fills the Field with empty Things
-   */
+    * Fills the Field with empty Things
+    */
   def clearField(): Unit = {
     val empty = Empty(Console.WHITE)
     field = Array.ofDim[Thing](xfield, yfield)
@@ -20,11 +20,20 @@ class Field {
       }
     }
   }
+
+  def getDisplay(x :Int, y : Int) : Char ={
+    field(x)(y).display
+  }
+
+ def getInstance(x :Int, y : Int) : Thing ={
+    field(x)(y)
+  }
+
   /**
-   * ToString TUI <br>
-   * Prints the field
-   * @return s a String
-   */
+    * ToString TUI <br>
+    * Prints the field
+    * @return s a String
+    */
   override def toString: String = {
     val empty = Empty(Console.WHITE)
     val rock = new Obstacle
@@ -73,11 +82,12 @@ class Field {
       s.posy = y
     }
   }
+
   /**
-   * Sets Obstacles on random Positions<br>
-   *   in the Field
-   */
-  def fillrandomField(): Unit = {
+    * Sets Obstacles on random Positions<br>
+    * in the Field
+    */
+  def setRandomObstacle(): Unit = {
     val random = new scala.util.Random
     val rock = new Obstacle
     var p = 0
@@ -140,8 +150,20 @@ class Field {
     case 'd' if (x._2 + 1 < yfield && x._2 + 1 >= 0) && field(x._1)(x._2 + 1).isInstanceOf[Empty] => true
     case _ => false
   }
-  // scalastyle:on
 
+  def matchTestIsInField(p: Player, i: Char): Boolean = {
+    matchTestIsInField((p.posx, p.posy), i)
+  }
+
+  def matchTestIsInField(x: (Int, Int), i: Char): Boolean = i match {
+    case 'a' if x._2 - 1 < yfield && x._2 - 1 >= 0 => true
+    case 'w' if x._1 - 1 < xfield && x._1 - 1 >= 0 => true
+    case 's' if x._1 + 1 < xfield && x._1 + 1 >= 0 => true
+    case 'd' if x._2 + 1 < yfield && x._2 + 1 >= 0 => true
+    case _ => false
+  }
+
+  // scalastyle:on
   /**
    * Moves a Thing <br>
    * @param t Thing. Can be Player or Empty
@@ -151,6 +173,7 @@ class Field {
   def setPosition(t: Thing, xnew: Int, ynew: Int): Unit = {
     field(xnew)(ynew) = t
   }
+
   /**
    * Moves the Player <br>
    * And set the old Place to empty.
@@ -197,9 +220,62 @@ class Field {
     x + y
   }
 
-  def getRange(start: Player, end: Player): Int = {
-    42
+  /**
+    * Calculate the MINIMUM Distance between two Players
+    *
+    * @param me is a Player
+    * @param pl is the Enemy Player List
+    * @return the Enemy with th min Distance
+    */
+  def getMinDistancetonextPlayer(me: Player, pl: List[Player]): Player = {
+    var min = 0
+    var tmp = 0
+    var minDisPly = me
+    for (p <- pl) {
+      tmp = getDistance(me, p)
+      if (min >= tmp) {
+        min = tmp
+        minDisPly = p
+      }
+
+    }
+    minDisPly
   }
+
+  // scalastyle:off
+  def dijkstraShowEnemiesInRange(p: Player, enemies: List[Player]): List[Player] = {
+    var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
+    var foundEnemies: List[Player] = List[Player]()
+    for (i <- 0 until p.getRange) {
+      for (x <- map.filter((t) => !t._2).keys) {
+        if (!matchTestValidInputSpace((x._1, x._2), 'w') && matchTestIsInField((x._1, x._2), 'w')) {
+
+          if ( enemies.contains(field(x._1 - 1)(x._2))) {
+
+            foundEnemies = foundEnemies :+ field(xfield)(yfield).asInstanceOf[Player]
+
+            map = map ++ Map((x._1 - 1, x._2) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 'a') && matchTestIsInField((x._1, x._2), 'a')) {
+            map = map ++ Map((x._1, x._2 - 1) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 's') && matchTestIsInField((x._1, x._2), 's')) {
+            map = map ++ Map((x._1 + 1, x._2) -> false)
+          }
+          if (!matchTestValidInputSpace((x._1, x._2), 'd') && matchTestIsInField((x._1, x._2), 'd')) {
+            map = map ++ Map((x._1, x._2 + 1) -> false)
+          }
+          map = map.updated(x, true)
+        }
+      }
+      map.keys.toList
+
+    }
+
+    foundEnemies
+  }
+
+  // scalastyle:on
 
   /*def showPossibleMoves(p : Player): Unit = {
     var steps = p.getSpeed
