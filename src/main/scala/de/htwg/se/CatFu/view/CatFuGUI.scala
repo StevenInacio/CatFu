@@ -1,20 +1,22 @@
-package de.htwg.se.CatFu.aview
+package de.htwg.se.CatFu.view
+
+import java.awt._
 
 import de.htwg.se.CatFu.logic.PlayerManagement
 import de.htwg.se.CatFu.model._
+
 import scala.swing._
-import java.awt._
 
 //noinspection ScalaStyle
 class CatFuGUI extends Frame {
-  var board = new Field()
-  var butt = new Button()
+  val p: List[Player] = PlayerManagement.randomTeam()
+  val e: List[Player] = PlayerManagement.enemyTeam(p)
 
 
+  val board = new Field()
   board.clearField()
   board.setRandomObstacle()
-  val p  = PlayerManagement.randomTeam()
-  val e  = PlayerManagement.enemyTeam(p)
+  val butt = new Button()
   board.setUpTeams(p, e)
 
 
@@ -51,9 +53,8 @@ class CatFuGUI extends Frame {
           contents += new Button() {
             background = Color.orange
             foreground = Color.black
-            var figure = board.getDisplay(i, j).toString
+            val figure: String = board.getDisplay(i, j).toString
             text = figure
-
           }
           //i ist x ist zeile
           //j = y = spalte
@@ -63,3 +64,5 @@ class CatFuGUI extends Frame {
 
     }, l = BorderPanel.Position.Center)
   }
+
+}
