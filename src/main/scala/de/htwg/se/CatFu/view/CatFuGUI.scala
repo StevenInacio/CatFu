@@ -1,11 +1,10 @@
 package de.htwg.se.CatFu.view
 
-import java.awt.Color
 
 import de.htwg.se.CatFu.logic.PlayerManagement
 import de.htwg.se.CatFu.model._
-
 import scala.swing._
+import java.awt.Color
 
 //noinspection ScalaStyle
 class CatFuGUI extends Frame {
@@ -37,22 +36,26 @@ class CatFuGUI extends Frame {
           }
           block = false
         }
-          contents += new Label("  " + i + "  ")
-          for (j <- 0 until board.yfield) {
-            foreground = Color.blue
-            background = Color.green
-            var butt = new Button()
-            butt.background = Color.red
-            //contents += butt
-            contents += new Button() {
-              background = Color.orange
-              foreground = Color.black
-              val figure: String = board.getDisplay(i, j).toString
-              text = figure
-            }// button end
-          }// for j
-      }// i for 12
+        contents += new Label("  " + i + "  ")
+        for (j <- 0 until board.yfield) {
+          foreground = Color.blue
+          background = Color.green
+          var butt = new Button()
+          butt.background = Color.red
+          //contents += butt
+          contents += new Button() {
+            background = Color.orange
+            foreground = Color.black
+            val figure: String = board.getDisplay(i, j).toString
+            text = figure
+          } // button end
+        } // for j
+      } // i for 12
       repaint()
     }, l = BorderPanel.Position.Center) //gridpanel end
-  }//borderpanel end
-}//Catgui end
+  } //borderpanel end
+
+}
+
+//Catgui end
+
