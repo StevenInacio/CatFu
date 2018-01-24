@@ -1,25 +1,23 @@
 package de.htwg.se.CatFu
 
 
-import de.htwg.se.CatFu.model._
 import de.htwg.se.CatFu.logic._
+import de.htwg.se.CatFu.model._
 
 import scala.io.StdIn.readLine
-import de.htwg.se.CatFu.aview._
+
 object CatFu {
 
-  val gui = new CatFuGUI()
+  // val gui = new CatFuGUI()
 
-  var counter: Int = 0
-
-  var board = new Field()
   val obs1 = Obstacle()
+  var counter: Int = 0
+  var board = new Field()
   var playerList: List[Player] = List()
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-
-    //menu()
+    menu()
   }
 
   def userinput(): String = {
@@ -27,13 +25,9 @@ object CatFu {
     userinput
   }
 
-  def gameProcess(): Unit = {
-
-  }
-
   def move(p: Player, remainingMoves: Int): Int = {
     clearScreen()
-    userPrint(board.highlight(board.dijkstra(p)))
+    userPrint(board.highlight(board.dijkstra(p, remainingMoves)))
     userPrint(Console.RED + "Please enter your way/ catjump" + Console.RESET + " compuurrrende?!")
     board.isValid(p, userinput(), remainingMoves)
   }
@@ -52,10 +46,10 @@ object CatFu {
       for (x <- playerList.indices) {
         if (!playerMap(x)._1) {
           userPrint(Console.INVISIBLE + (x + 1) + ": " + playerList(x).name +
-            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + Console.RESET)
+            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + Console.RESET + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP)
         } else {
           userPrint(Console.RED + (x + 1) + ": " + Console.RESET + playerList(x).name +
-            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")")
+            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP)
         }
       }
       userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
@@ -81,6 +75,37 @@ object CatFu {
 
   // scalastyle:on
 
+  def attackMenu(player: Player): Boolean = {
+    val enemiesInRange = board.dijkstraShowEnemiesInRange(player, enemyList)
+    userPrint("Which enemy do you want to attack?")
+    for (x <- enemiesInRange.indices) {
+      userPrint(Console.RED + (x + 1) + ": " + Console.RESET + enemiesInRange(x).name +
+        " @ (" + enemiesInRange(x).posy + "," + enemiesInRange(x).posx + ")" + " HitRate: " +
+        player.hitrate(enemiesInRange(x)) + "%")
+    }
+    try {
+      userinput() match {
+        case x if enemiesInRange.indices.contains(x.toInt - 1) =>
+          player.attack(enemiesInRange(x.toInt - 1)) match {
+            case 0 => userPrint(player.name + " missed " + enemiesInRange(x.toInt - 1).name + "!")
+              false
+            case -1 => userPrint(enemiesInRange(x.toInt - 1).name + " is already dead!")
+              true
+            case y => userPrint(player.name + " did " + y + " damage to " + enemiesInRange(x.toInt - 1).name)
+              if (enemiesInRange(x.toInt - 1).currentHP == 0) {
+                board.setPosition(Empty(Console.WHITE), enemiesInRange(x.toInt - 1).posx, enemiesInRange(x.toInt - 1).posy)
+                removeFromList(enemyList, x.toInt - 1)
+              }
+              false
+          }
+        case _ => true
+      }
+    }
+    catch {
+      case _: NumberFormatException => true
+    }
+  }
+
   def actionMenu(player: Player, map: Map[Int, (Boolean, Boolean)]): (Boolean, Boolean) = {
     clearScreen()
     var accepted = false
@@ -105,9 +130,10 @@ object CatFu {
           if (0 == remainingMoves) movable = false
         case "A" | "a" =>
           userPrint("Not yet implemented")
-          accepted = true
-          available = false
-        //attackMenu(player)
+          available = attackMenu(player)
+          if (!available) {
+            accepted = true
+          }
         case "E" | "e" =>
           available = false
           accepted = true
@@ -196,7 +222,12 @@ object CatFu {
     }
   }
 
-  def removeFromList(list: List[Player]): List[Player] = {
+  def removeFromList(list: List[Player], index: Int): List[Player] = {
+    val (l1, l2) = list.splitAt(index)
+    l1 ::: (l2 drop 1)
+  }
+
+  def removeMenu(list: List[Player]): List[Player] = {
     clearScreen()
     userPrint("Who do you want to remove?")
     for (x: Int <- list.indices) {
@@ -205,8 +236,7 @@ object CatFu {
     userPrint(Console.RED + "C" + Console.RESET + "ancel")
     userinput() match {
       case x if list.indices contains (x.toInt - 1) =>
-        val (l1, l2) = list.splitAt(x.toInt - 1)
-        l1 ::: (l2 drop 1)
+        removeFromList(list, x.toInt - 1)
       case "C" | "c" => list
       case _ =>
         userPrint("wrong input, cancelling")
@@ -229,7 +259,7 @@ object CatFu {
       userinput() match {
         case "L" | "l" => list = list ++ loadMenu()
         case "C" | "c" => list = list ++ createMenu()
-        case "R" | "r" => list = removeFromList(list)
+        case "R" | "r" => list = removeMenu(list)
         case "G" | "g" => list = PlayerManagement.randomTeam()
         case "S" | "s" => if (list.nonEmpty && list.length < 5) accepted = true
         case "E" | "e" => sys.exit(0)
@@ -267,37 +297,54 @@ object CatFu {
     enemyTurn()
   }
 
+  def victory(): Unit = {
+    userPrint(Console.RED + "YOU WON!" + Console.RESET)
+    userPrint("\n\n\n\n\n\n\n\n\n\n\n")
+    readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + "to continue.")
+    menu()
+  }
+
   def playerTurn(): Unit = {
     var map: Map[Int, (Boolean, Boolean)] = Map()
-    playerList.indices.foreach(p => map = map + (p -> (true, true)))
+    playerList.indices.foreach(p =>
+      if (playerList(p).currentHP == 0) {
+        map = map + (p -> (false, false))
+      }
+      else {
+        map = map + (p -> (true, true))
+      }
+    )
     userPrint(board)
     while (map.exists((t) => t._2._1)) {
-      var accepted = false
-      while (!accepted) {
-        val result = playerChoose(map)
-        result match {
-          case Some(x) =>
-            map = map.updated(playerList.indexOf(x), actionMenu(x, map))
-            accepted = true
-          case None => accepted
-        }
+      val result = playerChoose(map)
+      result match {
+        case Some(x) => // Player was selected
+          map = map.updated(playerList.indexOf(x), actionMenu(x, map))
+        case None => // End Turn was pressed
+          playerList.indices.foreach(p => map = map + (p -> (false, false)))
       }
     }
-    // attack
-    // legality check
-    // pass:
-    // attack(field(x)(y): Player)
-    // failed:
-    // return to previous menu
-    // after that set available to false
-    // wait (immediately set available to false and continue)
-    // cancel to previous menu
-    // End Turn
+    if (!enemyList.exists(p => p.currentHP != 0)) {
+      victory()
+    }
     enemyTurn()
   }
 
+  def defeat(): Unit = {
+    userPrint(Console.RED + "You lost!")
+    userPrint(Console.RESET + "Git gud.")
+    userPrint("\n\n\n\n\n\n\n\n\n")
+    readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + "to continue.")
+    menu()
+  }
+
   def enemyTurn(): Unit = {
-    // see User Turn, but with AI
+    for (x <- enemyList) {
+      val target = board.getMinDistancetonextPlayer(x, playerList)
+      val theWay: String = board.findWay(x, target).take(x.getSpeed)
+      //TODO: find de wae *cluck cluck cluck*
+    }
+    if (!playerList.exists(p => p.currentHP != 0)) defeat()
     playerTurn()
   }
 
@@ -333,7 +380,7 @@ object CatFu {
     field.setPosition(p, 3, 4)
     p.posx = 3
     p.posy = 4
-    val list = field.dijkstra(p)
+    val list = field.dijkstra(p, p.getSpeed)
     println(field.highlight(list))
   }
 

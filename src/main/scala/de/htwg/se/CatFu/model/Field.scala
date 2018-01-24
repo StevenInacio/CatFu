@@ -1,12 +1,69 @@
 package de.htwg.se.CatFu.model
 
-import de.htwg.se.CatFu.model._
-
 class Field {
   var stepsTaken = 0
   val xfield: Int = 12
   val yfield: Int = 12
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
+
+  // scalastyle:off
+  def findWay(player: Player, target: Player): String = {
+    var (x, y) = {
+      player.posx -> player.posy
+    }
+    val (x_1, y_1) = {
+      target.posx -> target.posy
+    }
+    var s: String = ""
+    var directx = x - x_1
+    var directy = y - y_1
+    var vert = true
+    while (directx.abs == 1 && directy == 0 || directx == 0 && directy.abs == 1) {
+      vert match {
+        case true if directx != 0 =>
+          if (directx < 0) {
+            if (matchTestValidInputSpace(x -> y, 's')) {
+              s += 's'
+              directx += 1
+              x -= 1
+            }
+            else {
+              vert = !vert
+            }
+          }
+          else {
+            if (matchTestValidInputSpace(x -> y, 'w')) {
+              s += 'w'
+              directx -= 1
+              x += 1
+            } else {
+              vert = !vert
+            }
+          }
+        case false if directy != 0 =>
+          if (directy < 0) {
+            if (matchTestValidInputSpace(x -> y, 'd')) {
+              s += 'd'
+              directy += 1
+              y -= 1
+            }
+            else vert = !vert
+          }
+          else {
+            if (matchTestValidInputSpace(x -> y, 'a')) {
+              s += 'a'
+              directy -= 1
+              y += 1
+            }
+            else vert = !vert
+          }
+        case _ => vert = !vert
+      }
+    }
+    s
+  }
+
+  // scalastyle:on
 
   /**
    * Fills the Field with empty Things
@@ -83,10 +140,10 @@ class Field {
     }
   }
   /**
-   * Sets Obstacles on random Positions<br>
-   *   in the Field
-   */
-  def fillrandomField(): Unit = {
+    * Sets Obstacles on random Positions<br>
+    * in the Field
+    */
+  def setRandomObstacle(): Unit = {
     val random = new scala.util.Random
     val rock = new Obstacle
     var p = 0
@@ -112,9 +169,7 @@ class Field {
     if (intSteps >= userInput.length) {
       for (i <- 0 until userInput.length) {
         if (!matchTestValidInputSpace(p, userInput.charAt(i))) {
-          val tempX = p.posx
-          val tempY = p.posx
-          setPosition(Empty(Console.WHITE), tempX, tempY)
+          setPosition(Empty(Console.WHITE), p.posx, p.posy)
           p.posx = xOld
           p.posy = yOld
           setPosition(p, p.posx, p.posy)
@@ -245,124 +300,47 @@ class Field {
     minDisPly
   }
 
-  def getRange(start: Player, enemies: List[Player]): List[Player] = {
-    enemies
-  }
-
-  // scalastyle:off
-  def dijkstraShowEnemiesInSpeed(p: Player, enemies: List[Player]): List[Player] = {
-    var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
-    var foundEnemies: List[Player] = List[Player]()
-    for (i <- 0 until p.getSpeed) {
-      for (x <- map.filter((t) => !t._2).keys) {
-        if (!matchTestValidInputSpace((x._1, x._2), 'w') && matchTestIsInField((x._1, x._2), 'w')) {
-
-          if ( enemies.contains(field(x._1 - 1)(x._2))) {
-
-            foundEnemies = foundEnemies :+ field(xfield)(yfield).asInstanceOf[Player]
-
-            map = map ++ Map((x._1 - 1, x._2) -> false)
-          }
-          if (!matchTestValidInputSpace((x._1, x._2), 'a') && matchTestIsInField((x._1, x._2), 'a')) {
-            map = map ++ Map((x._1, x._2 - 1) -> false)
-          }
-          if (!matchTestValidInputSpace((x._1, x._2), 's') && matchTestIsInField((x._1, x._2), 's')) {
-            map = map ++ Map((x._1 + 1, x._2) -> false)
-          }
-          if (!matchTestValidInputSpace((x._1, x._2), 'd') && matchTestIsInField((x._1, x._2), 'd')) {
-            map = map ++ Map((x._1, x._2 + 1) -> false)
-          }
-          map = map.updated(x, true)
-        }
-      }
-      map.keys.toList
-
-    }
-
-    foundEnemies
-  }
-
-  // scalastyle:on
-  /**
-    * Calculate the MINIMUM Distance between two Players
-    *
-    * @param me is a Player
-    * @param pl is the Enemy Player List
-    * @return the Enemy with th min Distance
-    */
-  def getMinDistancetonextPlayer(me: Player, pl: List[Player]): Player = {
-    var min = 0
-    var tmp = 0
-    var minDisPly = me
-    for (p <- pl) {
-      tmp = getDistance(me, p)
-      if (min >= tmp) {
-        min = tmp
-        minDisPly = p
-      }
-
-    }
-    minDisPly
-  }
-
   // scalastyle:off
   def dijkstraShowEnemiesInRange(p: Player, enemies: List[Player]): List[Player] = {
     var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
-    var foundEnemies: List[Player] = List[Player]()
-    for (i <- 0 until p.getRange) {
+    var foundEnemies: List[Player] = List()
+    for (_ <- 0 until p.getRange) {
       for (x <- map.filter((t) => !t._2).keys) {
-        if (!matchTestValidInputSpace((x._1, x._2), 'w') && matchTestIsInField((x._1, x._2), 'w')) {
-
-          if ( enemies.contains(field(x._1 - 1)(x._2))) {
-
-            foundEnemies = foundEnemies :+ field(xfield)(yfield).asInstanceOf[Player]
-
-            map = map ++ Map((x._1 - 1, x._2) -> false)
+        if (matchTestIsInField((x._1, x._2), 'w')) {
+          if (enemies.contains(field(x._1 - 1)(x._2)) && !foundEnemies.contains(field(x._1 - 1)(x._2))) {
+            foundEnemies = foundEnemies :+ field(x._1 - 1)(x._2).asInstanceOf[Player]
           }
-          if (!matchTestValidInputSpace((x._1, x._2), 'a') && matchTestIsInField((x._1, x._2), 'a')) {
-            map = map ++ Map((x._1, x._2 - 1) -> false)
-          }
-          if (!matchTestValidInputSpace((x._1, x._2), 's') && matchTestIsInField((x._1, x._2), 's')) {
-            map = map ++ Map((x._1 + 1, x._2) -> false)
-          }
-          if (!matchTestValidInputSpace((x._1, x._2), 'd') && matchTestIsInField((x._1, x._2), 'd')) {
-            map = map ++ Map((x._1, x._2 + 1) -> false)
-          }
-          map = map.updated(x, true)
+          map = map ++ Map((x._1 - 1, x._2) -> false)
         }
+        if (matchTestIsInField((x._1, x._2), 'a')) {
+          if (enemies.contains(field(x._1)(x._2 - 1)) && !foundEnemies.contains(field(x._1)(x._2 - 1))) {
+            foundEnemies = foundEnemies :+ field(x._1)(x._2 - 1).asInstanceOf[Player]
+          }
+          map = map ++ Map((x._1, x._2 - 1) -> false)
+        }
+        if (matchTestIsInField((x._1, x._2), 's')) {
+          if (enemies.contains(field(x._1 + 1)(x._2)) && !foundEnemies.contains(field(x._1 + 1)(x._2))) {
+            foundEnemies = foundEnemies :+ field(x._1 + 1)(x._2).asInstanceOf[Player]
+          }
+          map = map ++ Map((x._1 + 1, x._2) -> false)
+        }
+        if (matchTestIsInField((x._1, x._2), 'd')) {
+          if (enemies.contains(field(x._1)(x._2 + 1)) && !foundEnemies.contains(field(x._1)(x._2 + 1))) {
+            foundEnemies = foundEnemies :+ field(x._1)(x._2 + 1).asInstanceOf[Player]
+          }
+          map = map ++ Map((x._1, x._2 + 1) -> false)
+        }
+        map = map.updated(x, true)
       }
-      map.keys.toList
-
     }
-
     foundEnemies
   }
-
   // scalastyle:on
 
-  /*def showPossibleMoves(p : Player): Unit = {
-    var steps = p.getSpeed
-    val awsd: List[Char] = List('a', 'w', 's', 'd')
-    var l: Char = ' '
-    var x = p.posx
-    var y = p.posy
-    for (i <- 0 until (steps^2) +1) {
-      for (j <- 0 until 4) {
-
-
-        if (matchTestValidInputSpace(p, l=awsd(j))) {
-          print()
-              field(x)(y) == Empty(Console.MAGENTA_B)
-        }
-      }
-
-    }
-  }*/
-
-  def dijkstra(p: Player): List[(Int, Int)] = {
+  def dijkstra(p: Player, remainingMoves: Int): List[(Int, Int)] = {
     var map: Map[(Int, Int), Boolean] = Map((p.posx, p.posy) -> false)
 
-    for (i <- 0 until p.getSpeed) {
+    for (_ <- 0 until remainingMoves) {
       for (x <- map.filter((t) => !t._2).keys) {
         if (matchTestValidInputSpace((x._1, x._2), 'w')) {
           map = map ++ Map((x._1 - 1, x._2) -> false)
@@ -420,17 +398,5 @@ class Field {
     s += "|\n" + vertical
     s
   }
-
-  /*
-    var newx = 0
-  var newy = 0
-  input match {
-    case 'a' => {newy = player.posy -1
-                 newx = player.posx}
-    case 'w' =>
-  }
-
-  (0 until y).contains(newy)
-   */
 
 }
