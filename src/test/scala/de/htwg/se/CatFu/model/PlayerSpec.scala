@@ -15,10 +15,21 @@ class PlayerSpec extends WordSpec with Matchers {
       "have a nice String representation" in {
         player.toString should be("Your Name, the level 1 Pawrior")
       }
-      "has color" in {
-        player.color should be
-        "WHITE"
+      "A Player" when {
+        "new" should {
+          val player = new Warrior("Your Name", Console.WHITE)
+          "have a name" in {
+            player.name should be("Your Name")
+          }
+          "have a nice String representation" in {
+            player.toString should be("Your Name, the level 1 Pawrior")
+          }
+          "has color" in {
+            player.color should be
+            "WHITE"
+
+          }
+        }
       }
     }
   }
-}
