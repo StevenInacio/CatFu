@@ -17,16 +17,38 @@ class CatFuGUI extends Frame {
   board.setUpTeams(p, e)
 
 
-  preferredSize = new Dimension(850, 700)
+  preferredSize = new Dimension(600, 500)
   visible = true
   title = "CatFu"
 
   contents = new BorderPanel {
-    add(Button("South: Close") {
-      sys.exit(0)
+
+    add(new GridPanel(6, 6) {
+     var buttonButtons : BorderPanel = new BorderPanel {
+       add(new Button() {
+         text = "Move"
+       }, BorderPanel.Position.West)
+       add(new Button() {
+         text = "Attack"
+       }, BorderPanel.Position.West)
+       add(new Button() {
+         text = "Cancel"
+       }, BorderPanel.Position.West)
+       add(new Button() {
+         text = "End Turn"
+       }, BorderPanel.Position.West)
+       add(new Button() {
+        text = "Help"
+      }, BorderPanel.Position.West)
+      add(new Button() {
+        text = "Exit"
+        //sys.exit(0)
+      }, BorderPanel.Position.South)
+      }
     }, BorderPanel.Position.South)
 
-    add(c = new GridPanel(13, 13) {
+
+    add(new GridPanel(13, 13) {
       var block = true
       contents += new Label("     ")
       for (i <- 0 until 12) {

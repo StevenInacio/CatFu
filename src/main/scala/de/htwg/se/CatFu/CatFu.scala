@@ -18,7 +18,6 @@ object CatFu {
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-
     menu()
   }
 
