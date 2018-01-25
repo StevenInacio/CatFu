@@ -1,13 +1,11 @@
 package de.htwg.se.CatFu.view
 
-
-import de.htwg.se.CatFu.logic.PlayerManagement
+import de.htwg.se.CatFu.logic._
 import de.htwg.se.CatFu.model._
-import scala.swing._
-import java.awt.Color
 
-//noinspection ScalaStyle
-class CatFuGUI extends Frame {
+import de.htwg.util.Observer
+
+object CatFuGUI extends Observer {
 
   val board = new Field()
   val p: List[Player] = PlayerManagement.randomTeam()
@@ -16,76 +14,48 @@ class CatFuGUI extends Frame {
   board.setRandomObstacle()
   board.setUpTeams(p, e)
 
+  def startDialog(): Unit = {
+    new StartDialog
+  }
 
-  preferredSize = new Dimension(1300, 600)
-  visible = true
-  title = "CatFu"
+  def helpDialog(): Unit = {
+    new HelpDialog
+  }
 
-  contents = new BorderPanel {
+  def teamDialog(): Unit = {
+    new TeamDialog
+  }
 
-    add(new GridPanel(1, 1) {
+  def loadCharacterDialog(): Unit = {
+    new LoadCharacter
+  }
 
-      contents += new FlowPanel {
-        background = Color.black
-        val textArea = new TextArea {
-          text = "hier\nkönnte\nihre\nwerbung\nstehen\n\n...\nalles mit backslash n"
-          background = Color.green
-          foreground = Color.BLUE
-        }
-        contents += textArea
-      }
+  def createCharacterDialog(): Unit = {
+    new CreateCharacter
+  }
 
-    }, BorderPanel.Position.East)
+  def gameGUI(): Unit = {
+    new GameGUI
+  }
 
-    add(new GridPanel(1, 1) {
-      background = Color.blue
-      contents += new FlowPanel {
-        contents += Swing.HStrut(30)
-        contents += new Button("Move")
-        contents += new Button("Attack")
-        contents += new Button("Cancel")
-        contents += new Button("End Turn")
-        contents += new Button("Help")
-        contents += Button("Exit") {
-          sys.exit(0)
-        }
-      }
+  def updateGameGUI(x: State.Value): Unit = {
+    x match {
+      case _ =>
+    }
+  }
 
-    }, BorderPanel.Position.South)
-
-
-    add(new GridPanel(13, 13) {
-      var block = true
-      contents += new Label("     ")
-      for (i <- 0 until 12) {
-        if (block) {
-          for (k <- 0 until board.xfield) {
-            contents += new Label("  " + k + "  ")
-          }
-          block = false
-        }
-        contents += new Label("  " + i + "  ")
-        for (j <- 0 until board.yfield) {
-          background = Color.green
-          var butt = new Button()
-          butt.background = Color.red
-          //contents += butt
-          contents += new Button() {
-            background = Color.orange
-            //TODO : Print Things in their colors
-            var t : Thing = board.getInstance(i,j)
-            var color : String = ""
-            color = board.getColor(t)
-            //foreground(color)
-            //color = board.getColor(i,j)
-            val figure: String = board.getDisplay(i, j).toString
-            text = figure
-          } // button end
-        } // for j
-      } // i for 12
-      repaint()
-    }, l = BorderPanel.Position.Center) //gridpanel end
-  } //borderpanel end
+  override def update: Unit = {
+    Controller.state match {
+      case x if x == State.Start => startDialog()
+      case x if x == State.Help => helpDialog()
+      case x if x == State.Team => teamDialog()
+      case x if x == State.Load => loadCharacterDialog()
+      case x if x == State.Create => createCharacterDialog()
+      case x if x == State.Random || x == State.Done => gameGUI()
+      case x: State.Value => updateGameGUI(x)
+      case _ =>
+    }
+  }
 }
 
 //Catgui end

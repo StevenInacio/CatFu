@@ -102,10 +102,10 @@ object NoPlayer extends Player {
   override def getSpeed: Int = 0
 
   /**
-    * Sets the character to the level and calculate the stat increase.
-    * The actual stat increase is role dependent so it's only abstract.
-    *
-    * @param level the level the character should be.
-    */
+   * Sets the character to the level and calculate the stat increase.
+   * The actual stat increase is role dependent so it's only abstract.
+   *
+   * @param level the level the character should be.
+   */
   override def setLvl(level: Int): Unit = {}
 }

@@ -9,13 +9,13 @@ class Field {
   val rock = Obstacle()
   clearField()
   /**
-    * GetColor returns the Color of a Thing in String
-    * @param t Thing
-    * @return String color
-    */
-  def getColor(t: Thing): String ={
-  t.color
-}
+   * GetColor returns the Color of a Thing in String
+   * @param t Thing
+   * @return String color
+   */
+  def getColor(t: Thing): String = {
+    t.color
+  }
 
   // scalastyle:off
   def findWay(player: Player, target: Player): String = {
@@ -152,8 +152,8 @@ class Field {
   // scalastyle:on
 
   /**
-    * Fills the Field with empty Things
-    */
+   * Fills the Field with empty Things
+   */
   def clearField(): Unit = {
     val empty = Empty(Console.WHITE)
     field = Array.ofDim[Thing](xfield, yfield)
@@ -164,34 +164,33 @@ class Field {
     }
   }
 
-
   /**
-    * Returns a Display Char
-    *
-    * @param x Int
-    * @param y Int
-    * @return the Display Char of the Thing in this field
-    */
+   * Returns a Display Char
+   *
+   * @param x Int
+   * @param y Int
+   * @return the Display Char of the Thing in this field
+   */
   def getDisplay(x: Int, y: Int): Char = {
     field(x)(y).display
   }
 
- /**
-    * Returns the Thing
-    *
-    * @param x Int
-    * @param y Int
-    * @return the Thing in this field
-    */
- def getInstance(x :Int, y : Int) : Thing ={
+  /**
+   * Returns the Thing
+   *
+   * @param x Int
+   * @param y Int
+   * @return the Thing in this field
+   */
+  def getInstance(x: Int, y: Int): Thing = {
     field(x)(y)
   }
 
   /**
-    * ToString TUI <br>
-    * Prints the field
-    * @return s a String
-    */
+   * ToString TUI <br>
+   * Prints the field
+   * @return s a String
+   */
   override def toString: String = {
     val empty = Empty(Console.WHITE)
     val rock = new Obstacle
@@ -206,8 +205,7 @@ class Field {
         for (k <- 0 until xfield) {
           if (k > 9) {
             s += " " + k + " "
-          }
-          else {
+          } else {
             s += "  " + k + " "
           }
         }
@@ -219,8 +217,7 @@ class Field {
       s += "\n    " + vertical + "\n"
       if (i > 9) {
         s += " " + i + " "
-      }
-      else {
+      } else {
         s += "  " + i + " "
       }
       for (j <- 0 until yfield) {
@@ -262,9 +259,9 @@ class Field {
     }
   }
   /**
-    * Sets Obstacles on random Positions<br>
-    * in the Field
-    */
+   * Sets Obstacles on random Positions<br>
+   * in the Field
+   */
   def setRandomObstacle(): Unit = {
     val random = new scala.util.Random
     var p = 0
@@ -303,15 +300,15 @@ class Field {
   }
 
   /**
-    * Matches<br>
-    * single Char after wasd
-    * and even in the field
-    * and if the next field is empty
-    *
-    * @param p Player
-    * @param i Char
-    * @return just a Checkbool
-    */
+   * Matches<br>
+   * single Char after wasd
+   * and even in the field
+   * and if the next field is empty
+   *
+   * @param p Player
+   * @param i Char
+   * @return just a Checkbool
+   */
   // scalastyle:off
   def matchTestValidInputSpace(p: Player, i: Char): Boolean = {
     matchTestValidInputSpace((p.posx, p.posy), i)
@@ -339,12 +336,12 @@ class Field {
 
   // scalastyle:on
   /**
-    * Moves a Thing <br>
-    *
-    * @param t    Thing. Can be Player or Empty
-    * @param xnew New x position
-    * @param ynew New y position
-    */
+   * Moves a Thing <br>
+   *
+   * @param t    Thing. Can be Player or Empty
+   * @param xnew New x position
+   * @param ynew New y position
+   */
   def setPosition(t: Thing, xnew: Int, ynew: Int): Unit = {
     t match {
       case player: Player =>
@@ -356,13 +353,13 @@ class Field {
   }
 
   /**
-    * Moves the Player <br>
-    * And set the old Place to empty.
-    *
-    * @param input is a Char from the userinput, that were checked of valid from the method isvalid
-    * @param p     is the Thing that will be moved.
-    * @return just a Checkbool
-    */
+   * Moves the Player <br>
+   * And set the old Place to empty.
+   *
+   * @param input is a Char from the userinput, that were checked of valid from the method isvalid
+   * @param p     is the Thing that will be moved.
+   * @return just a Checkbool
+   */
   // verknüpfen mit move2 weil das eine liste erstellt
   def realmove(p: Player, input: Char): Boolean = { // unbedingt clear zuerst
 
@@ -386,12 +383,12 @@ class Field {
   }
 
   /**
-    * Calculate the Distance between two Players
-    *
-    * @param start is a Player
-    * @param end   is a Player
-    * @return the Distance in int
-    */
+   * Calculate the Distance between two Players
+   *
+   * @param start is a Player
+   * @param end   is a Player
+   * @return the Distance in int
+   */
   def getDistance(start: Player, end: Player): Int = { // Ohne Rocks zu beabsichtigen
     val x = start.posx - end.posx
     val y = start.posy - end.posy
@@ -399,12 +396,12 @@ class Field {
   }
 
   /**
-    * Calculate the MINIMUM Distance between two Players
-    *
-    * @param me is a Player
-    * @param pl is the Enemy Player List
-    * @return the Enemy with th min Distance
-    */
+   * Calculate the MINIMUM Distance between two Players
+   *
+   * @param me is a Player
+   * @param pl is the Enemy Player List
+   * @return the Enemy with th min Distance
+   */
   def getMinDistanceToNextPlayer(me: Player, pl: List[Player]): Player = {
     var min = Int.MaxValue
     var tmp = 0
