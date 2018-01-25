@@ -72,7 +72,9 @@ abstract case class Player() extends Thing {
    * The actual stat increase is role dependent so it's only abstract.
    * @param level the level the character should be.
    */
-  def setLvl(level: Int)
+  def setLvl(level: Int): Unit = {
+    lvl = level
+  }
 
   /**
    * Calculates a hit or miss and damages the enemy player accordingly.
