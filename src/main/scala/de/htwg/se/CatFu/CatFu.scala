@@ -1,6 +1,5 @@
 package de.htwg.se.CatFu
 
-
 import de.htwg.se.CatFu.logic._
 import de.htwg.se.CatFu.model._
 
@@ -11,9 +10,9 @@ object CatFu {
   // val gui = new CatFuGUI()
 
   val obs1 = Obstacle()
-  var counter: Int = 0
   var board = new Field()
   var playerList: List[Player] = List()
+  var startingTeam: List[Player] = List()
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
@@ -32,32 +31,37 @@ object CatFu {
     board.isValid(p, userinput(), remainingMoves)
   }
 
-  // scalastyle:off
+  def printPlayerChoose(playerMap: Map[Int, (Boolean, Boolean)], falseInput: Boolean): Boolean = {
+    var falseInput = falseInput
+    userPrint(board)
+    userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+    userPrint(Console.RED + "Which Pokemon" + Console.RESET +
+      "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
+    for (x <- playerList.indices) {
+      if (!playerMap(x)._1) {
+        userPrint(Console.INVISIBLE + (x + 1) + ": " + playerList(x).name +
+          " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP + Console.RESET)
+      } else {
+        userPrint(Console.RED + (x + 1) + ": " + Console.RESET + playerList(x).name +
+          " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP)
+      }
+    }
+    userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
+    if (falseInput) {
+      userPrint("What? Please try it again and get your Cat away from your keyboard." +
+        "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
+      falseInput = false
+    }
+    falseInput
+  }
+
   def playerChoose(playerMap: Map[Int, (Boolean, Boolean)]): Option[Player] = {
     var accepted = false
     var index = -1
     var falseInput = false
     while (!accepted) {
       clearScreen()
-      userPrint(board)
-      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
-      userPrint(Console.RED + "Which Pokemon" + Console.RESET +
-        "... I mean Kitty " + Console.RED + "do you wanna choose?" + Console.RESET)
-      for (x <- playerList.indices) {
-        if (!playerMap(x)._1) {
-          userPrint(Console.INVISIBLE + (x + 1) + ": " + playerList(x).name +
-            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + Console.RESET + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP)
-        } else {
-          userPrint(Console.RED + (x + 1) + ": " + Console.RESET + playerList(x).name +
-            " @ (" + playerList(x).posy + "," + playerList(x).posx + ")" + "HP: " + playerList(x).currentHP + "/" + playerList(x).getMaxHP)
-        }
-      }
-      userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
-      if (falseInput) {
-        userPrint("What? Please try it again and get your Cat away from your keyboard." +
-          "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
-        falseInput = false
-      }
+      falseInput = printPlayerChoose(playerMap, falseInput)
       try {
         userinput() match {
           case "E" | "e" => accepted = true
@@ -73,58 +77,71 @@ object CatFu {
     if (index == -1) None else Some(playerList(index))
   }
 
-  // scalastyle:on
-
-  def attackMenu(player: Player): Boolean = {
-    val enemiesInRange = board.dijkstraShowEnemiesInRange(player, enemyList)
-    userPrint("Which enemy do you want to attack?")
+  def printInRange(player: Player, enemiesInRange: List[Player]): Unit = {
     for (x <- enemiesInRange.indices) {
       userPrint(Console.RED + (x + 1) + ": " + Console.RESET + enemiesInRange(x).name +
         " @ (" + enemiesInRange(x).posy + "," + enemiesInRange(x).posx + ")" + " HitRate: " +
-        player.hitrate(enemiesInRange(x)) + "%")
+        player.hitrate(enemiesInRange(x)) + "%" + " HP: " + enemiesInRange(x).currentHP + "/" + enemiesInRange(x).getMaxHP)
     }
+  }
+
+  def tryAttacking(player: Player, enemiesInRange: List[Player]): Boolean = {
     try {
       userinput() match {
         case x if enemiesInRange.indices.contains(x.toInt - 1) =>
           player.attack(enemiesInRange(x.toInt - 1)) match {
-            case 0 => userPrint(player.name + " missed " + enemiesInRange(x.toInt - 1).name + "!")
+            case 0 =>
+              userPrint(player.name + " missed " + enemiesInRange(x.toInt - 1).name + "!")
               false
-            case -1 => userPrint(enemiesInRange(x.toInt - 1).name + " is already dead!")
+            case -1 =>
+              userPrint(enemiesInRange(x.toInt - 1).name + " is already dead!")
               true
-            case y => userPrint(player.name + " did " + y + " damage to " + enemiesInRange(x.toInt - 1).name)
-              if (enemiesInRange(x.toInt - 1).currentHP == 0) {
-                board.setPosition(Empty(Console.WHITE), enemiesInRange(x.toInt - 1).posx, enemiesInRange(x.toInt - 1).posy)
-                removeFromList(enemyList, x.toInt - 1)
+            case y =>
+              userPrint(player.name + " did " + y + " damage to " + enemiesInRange(x.toInt - 1).name)
+              if (isPlayerDead(enemiesInRange(x.toInt - 1), true)) {
+                if (enemyList.isEmpty) {
+                  victory()
+                }
               }
               false
           }
         case _ => true
       }
-    }
-    catch {
+    } catch {
       case _: NumberFormatException => true
     }
   }
 
+  def attackMenu(player: Player): Boolean = {
+    val enemiesInRange = board.dijkstraShowEnemiesInRange(player, enemyList)
+    userPrint("Which enemy do you want to attack?")
+    printInRange(player, enemiesInRange)
+    tryAttacking(player, enemiesInRange)
+  }
+
+  def printActionMenu(player: Player, map: Map[Int, (Boolean, Boolean)], movable: Boolean): Unit = {
+    userPrint(board.highlight(player))
+    userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
+    userPrint("What do you want to do?")
+    if (movable) {
+      userPrint(Console.RED + "M" + Console.RESET + "ove")
+    } else {
+      userPrint(Console.INVISIBLE + "Move" + Console.RESET)
+    }
+    userPrint(Console.RED + "A" + Console.RESET + "ttack")
+    userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
+    userPrint(Console.RED + "C" + Console.RESET + "ancel")
+  }
+
   def actionMenu(player: Player, map: Map[Int, (Boolean, Boolean)]): (Boolean, Boolean) = {
-    clearScreen()
     var accepted = false
     var remainingMoves = player.getSpeed
     var movable = map(playerList.indexOf(player))._2
     var available = map(playerList.indexOf(player))._1
     while (!accepted) {
-      userPrint(board.highlight(player))
-      userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
-      userPrint("What do you want to do?")
-      if (movable) {
-        userPrint(Console.RED + "M" + Console.RESET + "ove")
-      } else {
-        userPrint(Console.INVISIBLE + "Move" + Console.RESET)
-      }
-      userPrint(Console.RED + "A" + Console.RESET + "ttack")
-      userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
-      userPrint(Console.RED + "C" + Console.RESET + "ancel")
-      readLine(">") match {
+      clearScreen()
+      printActionMenu(player, map, movable)
+      userinput() match {
         case "M" | "m" if movable =>
           remainingMoves -= move(player, remainingMoves)
           if (0 == remainingMoves) movable = false
@@ -179,7 +196,8 @@ object CatFu {
     println("\u001b[H\u001b[J")
   }
 
-  def printCharacterMenu(list: List[Player]): Unit = {
+  def printCharacterMenu(list: List[Player], falseInput: Boolean): Boolean = {
+    var falseInput = falseInput
     if (list.length > 4) {
       userPrint(Console.RED + "TOO MANY KITTENS" + Console.RESET)
     }
@@ -195,6 +213,11 @@ object CatFu {
     userPrint(Console.RED + "G" + Console.RESET + "enerate a random Team?")
     userPrint(Console.RED + "S" + Console.RESET + "tart the game or")
     userPrint(Console.RED + "E" + Console.RESET + "xit while you still can?")
+    if (falseInput) {
+      userPrint("What? I didn't get that.")
+      falseInput = false
+    }
+    falseInput
   }
 
   def loadMenu(): List[Player] = {
@@ -244,63 +267,56 @@ object CatFu {
     }
   }
 
-  // scalastyle:off
+  def characterMenuInput(list: List[Player]): (Boolean, Boolean, List[Player]) = {
+    val list: List[Player] = list
+    userinput() match {
+      case "L" | "l" => (false, false, list ++ loadMenu())
+      case "C" | "c" => (false, false, list ++ createMenu())
+      case "R" | "r" => (false, false, removeMenu(list))
+      case "G" | "g" => (true, false, PlayerManagement.randomTeam())
+      case "S" | "s" => if (list.nonEmpty && list.length < 5) {
+        (true, false, list)
+      } else {
+        (false, false, list)
+      }
+      case "E" | "e" => sys.exit(0)
+      case _ => (false, true, list)
+    }
+  }
+
   def characterMenu(): List[Player] = {
-    var list: List[Player] = List()
-    var accepted = false
+    val list: List[Player] = List()
+    val accepted = false
     var falseInput = false
     while (!accepted) {
       clearScreen()
-      printCharacterMenu(list)
-      if (falseInput) {
-        userPrint("What? I didn't get that.")
-        falseInput = false
-      }
-      userinput() match {
-        case "L" | "l" => list = list ++ loadMenu()
-        case "C" | "c" => list = list ++ createMenu()
-        case "R" | "r" => list = removeMenu(list)
-        case "G" | "g" => list = PlayerManagement.randomTeam()
-        case "S" | "s" => if (list.nonEmpty && list.length < 5) accepted = true
-        case "E" | "e" => sys.exit(0)
-        case _ => falseInput = true
-      }
+      falseInput = printCharacterMenu(list, falseInput)
+      (accepted, falseInput, list) = characterMenuInput(list)
     }
     list
   }
 
-  // scalastyle:on
-
   def start(): Unit = {
-    // Player management up to 4 ()
     playerList = characterMenu()
     enemyList = PlayerManagement.enemyTeam(playerList)
     board.clearField()
     board.setRandomObstacle() // set Obstacles
     board.setUpTeams(playerList, enemyList)
     userPrint(board)
-    playerTurn()
-
-    // Generate 3-4 Random Enemies split playergroup total level among them [+] done
-    // Enemy Factory. Abstract or Method Combine with Player? [+] done
-    // prepare Board [+] done
-    // spawn it in [+] done
-    // set Obstacles [+] done
-    // set Enemies to random upper locations [+] done
-    // let Players decide where to place their pawns? [-] scrapped
-    // show Board and Controls on Screen [+]
-    /*val rand = new scala.util.Random
+    val rand = new scala.util.Random
     rand.nextBoolean() match {
       case true => playerTurn()
       case false => enemyTurn()
-    }*/
-    enemyTurn()
+    }
   }
 
   def victory(): Unit = {
     userPrint(Console.RED + "YOU WON!" + Console.RESET)
     userPrint("\n\n\n\n\n\n\n\n\n\n\n")
     readLine("Press " + Console.UNDERLINED + "<Enter>" + Console.RESET + "to continue.")
+    for (x <- playerList) {
+
+    }
     menu()
   }
 
@@ -309,11 +325,9 @@ object CatFu {
     playerList.indices.foreach(p =>
       if (playerList(p).currentHP == 0) {
         map = map + (p -> (false, false))
-      }
-      else {
+      } else {
         map = map + (p -> (true, true))
-      }
-    )
+      })
     userPrint(board)
     while (map.exists((t) => t._2._1)) {
       val result = playerChoose(map)
@@ -338,28 +352,49 @@ object CatFu {
     menu()
   }
 
+  def isPlayerDead(target: Player, enemy: Boolean): Boolean = {
+    if (target.currentHP == 0) {
+      board.setPosition(Empty(""), target.posx, target.posy)
+      if (enemy) {
+        enemyList = removeFromList(enemyList, enemyList.indexOf(target))
+      } else {
+        playerList = removeFromList(playerList, playerList.indexOf(target))
+      }
+      true
+    }
+    else {
+      false
+    }
+  }
+
+  def enemyMove(x: Player): Player = {
+    val target = board.getMinDistanceToNextPlayer(x, playerList)
+    val distanceToTarget = board.getDistance(x, target)
+    if (distanceToTarget > x.getRange) {
+      val theWay = board.findWay(x, target).take(distanceToTarget - x.getRange)
+      board.isValid(x, theWay, x.getSpeed)
+    }
+    target
+  }
+
   def enemyTurn(): Unit = {
     for (x <- enemyList) {
       clearScreen()
       userPrint(board.highlight(x))
-      val target = board.getMinDistanceToNextPlayer(x, playerList)
-      val distanceToTarget = board.getDistance(x, target)
-      if(distanceToTarget > x.getRange) {
-        val theWay = board.findWay(x, target).take(x.getSpeed).take(distanceToTarget - x.getRange)
-        board.isValid(x, theWay, x.getSpeed)
-      }
-      Thread.sleep(500) // scalastyle:ignore
+      val target = enemyMove(x)
+      Thread.sleep(1000) // scalastyle:ignore
+      clearScreen()
       if (board.getDistance(x, target) <= x.getRange) {
-        clearScreen()
         x.attack(target)
+        if (isPlayerDead(target, false)) {
+          if (playerList.isEmpty) defeat()
+        }
         userPrint(board.highlight(List((x.posx, x.posy), (target.posx, target.posy))))
-      }
-      else {
+      } else {
         userPrint(board.highlight(x))
       }
       Thread.sleep(1000) // scalastyle:ignore
     }
-    if (!playerList.exists(p => p.currentHP != 0)) defeat()
     playerTurn()
   }
 

@@ -5,7 +5,7 @@ class Field {
   val xfield: Int = 12
   val yfield: Int = 12
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
-  val empty = Empty(Console.WHITE)
+  val empty = Empty("")
   val rock = Obstacle()
 
   // scalastyle:off
@@ -20,26 +20,24 @@ class Field {
     var directx = x - x_1
     var directy = y - y_1
     var vert = true
-
+    var stepCounter = 0
     var errorCount = 0
-    while (!((directx.abs == 1 && directy == 0) || (directx == 0 && directy.abs == 1))) {
+    while (!((directx.abs == 1 && directy == 0) || (directx == 0 && directy.abs == 1)) && stepCounter < player.getSpeed) {
       vert match {
         case v if errorCount > 2 =>
           if (v) {
             if (matchTestValidInputSpace(x -> y, 'w')) {
-              if (s.nonEmpty) if (s.last == 's'){
+              if (s.nonEmpty) if (s.last == 's') {
                 s = s.slice(0, s.length - 1)
-              }
-              else {
+              } else {
                 s += 'w'
                 errorCount -= 1
               }
               directx -= 1
               x -= 1
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-              if(errorCount <= 2) vert = !vert
-            }
-            else if (matchTestValidInputSpace(x -> y, 's')) {
+              stepCounter += 1
+              if (errorCount <= 2) vert = !vert
+            } else if (matchTestValidInputSpace(x -> y, 's')) {
               if (s.nonEmpty) if (s.last == 'w') s = s.slice(0, s.length - 1)
               else {
                 s += 's'
@@ -47,45 +45,41 @@ class Field {
               }
               directx += 1
               x += 1
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-              if(errorCount <= 2) vert = !vert
-            }
-            else {
+              if (errorCount <= 2) vert = !vert
+              stepCounter += 1
+            } else {
               errorCount += 1
               vert = !vert
             }
           } else {
             if (matchTestValidInputSpace(x -> y, 'a')) {
-              if (s.nonEmpty) if (s.last == 'd') s = s.slice(0,s.length - 1)
+              if (s.nonEmpty) if (s.last == 'd') s = s.slice(0, s.length - 1)
               else {
                 s += 'a'
                 errorCount -= 1
               }
               directy -= 1
               y -= 1
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-              if(errorCount <= 2) vert = !vert
-            }
-            else if (matchTestValidInputSpace(x -> y, 'd')) {
+              stepCounter += 1
+              if (errorCount <= 2) vert = !vert
+            } else if (matchTestValidInputSpace(x -> y, 'd')) {
               if (s.nonEmpty) if (s.last == 'a') {
-                s = s.slice(0,s.length - 1)
+                s = s.slice(0, s.length - 1)
 
-              }
-              else {
+              } else {
                 s += 'd'
                 errorCount -= 1
               }
               directy += 1
               y += 1
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-              if(errorCount <= 2) vert = !vert
-            }
-            else {
+              stepCounter += 1
+              if (errorCount <= 2) vert = !vert
+            } else {
               errorCount += 1
               vert = !vert
             }
           }
-          if (errorCount > 10 ){
+          if (errorCount > 10) {
             s = ""
             directx = 1
             directy = 0
@@ -97,20 +91,18 @@ class Field {
               directx += 1
               x += 1
               errorCount = 0
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-            }
-            else {
+              stepCounter += 1
+            } else {
               errorCount += 1
               vert = !vert
             }
-          }
-          else {
+          } else {
             if (matchTestValidInputSpace(x -> y, 'w')) {
               s += 'w'
               directx -= 1
               x -= 1
               errorCount = 0
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
+              stepCounter += 1
             } else {
               errorCount += 1
               vert = !vert
@@ -123,22 +115,19 @@ class Field {
               directy += 1
               y += 1
               errorCount = 0
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-            }
-            else {
+              stepCounter += 1
+            } else {
               errorCount += 1
               vert = !vert
             }
-          }
-          else {
+          } else {
             if (matchTestValidInputSpace(x -> y, 'a')) {
               s += 'a'
               directy -= 1
               y -= 1
               errorCount = 0
-              println(highlight(List((player.posx, player.posy), (x, y), (target.posx, target.posy))))
-            }
-            else {
+              stepCounter += 1
+            } else {
               errorCount += 1
               vert = !vert
             }
@@ -166,17 +155,18 @@ class Field {
     }
   }
 
-  def getDisplay(x :Int, y : Int) : Char ={
+  def getDisplay(x: Int, y: Int): Char = {
     field(x)(y).display
   }
 
- def getInstance(x :Int, y : Int) : Thing ={
+  def getInstance(x: Int, y: Int): Thing = {
     field(x)(y)
   }
 
   /**
     * ToString TUI <br>
     * Prints the field
+    *
     * @return s a String
     */
   override def toString: String = {
@@ -331,7 +321,6 @@ class Field {
     */
   // verknüpfen mit move2 weil das eine liste erstellt
   def realmove(p: Player, input: Char): Boolean = { // unbedingt clear zuerst
-
 
     if (input == 'a') {
       setPosition(empty, p.posx, p.posy) // Set empty behind player

@@ -17,7 +17,6 @@ class CatFuGUI extends Frame {
   board.setRandomObstacle()
   board.setUpTeams(p, e)
 
-
   preferredSize = new Dimension(850, 700)
   visible = true
   title = "CatFu"
@@ -57,9 +56,7 @@ class CatFuGUI extends Frame {
       }
       repaint()
 
-
     }, l = BorderPanel.Position.Center)
-
 
   }
 }
