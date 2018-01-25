@@ -7,6 +7,14 @@ class Field {
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
   clearField()
 
+  /**
+    * GetColor returns the Color of a Thing in String
+    * @param t Thing
+    * @return String color
+    */
+  def getColor(t: Thing): String ={
+  t.color
+}
 
   // scalastyle:off
   def findWay(player: Player, target: Player): String = {
