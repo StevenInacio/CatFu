@@ -32,7 +32,7 @@ object CatFu {
   }
 
   def printPlayerChoose(playerMap: Map[Int, (Boolean, Boolean)], falseInput: Boolean): Boolean = {
-    var falseInput = falseInput
+    var input: Boolean = falseInput
     userPrint(board)
     userPrint(Console.RED + "Now it´s your turn." + Console.RESET)
     userPrint(Console.RED + "Which Pokemon" + Console.RESET +
@@ -47,12 +47,12 @@ object CatFu {
       }
     }
     userPrint(Console.RED + "E" + Console.RESET + "nd Turn")
-    if (falseInput) {
+    if (input) {
       userPrint("What? Please try it again and get your Cat away from your keyboard." +
         "\nIt´s not a Game for cats. It´s a game about cats, buddy.")
-      falseInput = false
+      input = false
     }
-    falseInput
+    input
   }
 
   def playerChoose(playerMap: Map[Int, (Boolean, Boolean)]): Option[Player] = {
@@ -197,7 +197,7 @@ object CatFu {
   }
 
   def printCharacterMenu(list: List[Player], falseInput: Boolean): Boolean = {
-    var falseInput = falseInput
+    var input: Boolean = falseInput
     if (list.length > 4) {
       userPrint(Console.RED + "TOO MANY KITTENS" + Console.RESET)
     }
@@ -215,9 +215,9 @@ object CatFu {
     userPrint(Console.RED + "E" + Console.RESET + "xit while you still can?")
     if (falseInput) {
       userPrint("What? I didn't get that.")
-      falseInput = false
+      input = false
     }
-    falseInput
+    input
   }
 
   def loadMenu(): List[Player] = {
@@ -268,7 +268,6 @@ object CatFu {
   }
 
   def characterMenuInput(list: List[Player]): (Boolean, Boolean, List[Player]) = {
-    val list: List[Player] = list
     userinput() match {
       case "L" | "l" => (false, false, list ++ loadMenu())
       case "C" | "c" => (false, false, list ++ createMenu())
@@ -285,13 +284,16 @@ object CatFu {
   }
 
   def characterMenu(): List[Player] = {
-    val list: List[Player] = List()
-    val accepted = false
+    var list: List[Player] = List()
+    var accepted = false
     var falseInput = false
     while (!accepted) {
       clearScreen()
       falseInput = printCharacterMenu(list, falseInput)
-      (accepted, falseInput, list) = characterMenuInput(list)
+      val x = characterMenuInput(list)
+      list = x._3
+      falseInput = x._2
+      accepted = x._1
     }
     list
   }
@@ -361,8 +363,7 @@ object CatFu {
         playerList = removeFromList(playerList, playerList.indexOf(target))
       }
       true
-    }
-    else {
+    } else {
       false
     }
   }

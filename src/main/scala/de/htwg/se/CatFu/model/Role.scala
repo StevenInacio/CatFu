@@ -5,12 +5,12 @@ class Mage(val name: String, override val color: String) extends Player() {
   val base_hp: Int = 8
   val base_att: Int = 0
   val base_def: Int = 0
-  override var currentHP: Int = hp
-  private var range: Int = 3
   private var hp = base_hp + 4
+  override var currentHP: Int = hp
   private var att = base_att + 3
   private var defense = base_def + 2
   private var speed = 3
+  private var range: Int = 3
 
   def setLvl(level: Int): Unit = {
     lvl = level
@@ -51,8 +51,8 @@ class Warrior(val name: String, override val color: String) extends Player() {
   val base_hp: Int = 9
   val base_att: Int = 0
   val base_def: Int = 1
-  override var currentHP: Int = hp
   private var hp = base_hp + 6
+  override var currentHP: Int = hp
   private var att = base_att + 2
   private var defense = base_def + 4
   private var speed = 4 // scalastyle:ignore
