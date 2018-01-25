@@ -7,6 +7,15 @@ class Field {
   var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
   val empty = Empty(Console.WHITE)
   val rock = Obstacle()
+  clearField()
+  /**
+    * GetColor returns the Color of a Thing in String
+    * @param t Thing
+    * @return String color
+    */
+  def getColor(t: Thing): String ={
+  t.color
+}
 
   // scalastyle:off
   def findWay(player: Player, target: Player): String = {
@@ -154,8 +163,8 @@ class Field {
   // scalastyle:on
 
   /**
-   * Fills the Field with empty Things
-   */
+    * Fills the Field with empty Things
+    */
   def clearField(): Unit = {
     val empty = Empty(Console.WHITE)
     field = Array.ofDim[Thing](xfield, yfield)
@@ -166,11 +175,26 @@ class Field {
     }
   }
 
-  def getDisplay(x :Int, y : Int) : Char ={
+
+  /**
+    * Returns a Display Char
+    *
+    * @param x Int
+    * @param y Int
+    * @return the Display Char of the Thing in this field
+    */
+  def getDisplay(x: Int, y: Int): Char = {
     field(x)(y).display
   }
 
- def getInstance(x :Int, y : Int) : Thing ={
+  /**
+    * Returns the Thing
+    *
+    * @param x Int
+    * @param y Int
+    * @return the Thing in this field
+    */
+  def getInstance(x: Int, y: Int): Thing = {
     field(x)(y)
   }
 
@@ -185,11 +209,32 @@ class Field {
     val reset = Console.RESET
     var s: String = ""
     var vertical = "----"
+    var block = true
     vertical = (vertical * yfield) + "-"
-    for (i <- 0 until xfield) { // to -1
-      if (i > 0) { s += "|" }
-      s += "\n" + vertical + "\n"
-      for (j <- 0 until yfield) { // to -1
+    s += "    "
+    for (i <- 0 until xfield) {
+      if (block) {
+        for (k <- 0 until xfield) {
+          if (k > 9) {
+            s += " " + k + " "
+          }
+          else {
+            s += "  " + k + " "
+          }
+        }
+        block = false
+      }
+      if (i > 0) {
+        s += "|"
+      }
+      s += "\n    " + vertical + "\n"
+      if (i > 9) {
+        s += " " + i + " "
+      }
+      else {
+        s += "  " + i + " "
+      }
+      for (j <- 0 until yfield) {
         val thing: Thing = field(i)(j)
         if (thing == empty) {
           s += "|   "
@@ -200,7 +245,7 @@ class Field {
         }
       }
     }
-    s += "|\n" + vertical
+    s += "|\n    " + vertical
     s
   }
 
@@ -236,7 +281,9 @@ class Field {
     var p = 0
     if (yfield > xfield) {
       p = xfield
-    } else { p = yfield }
+    } else {
+      p = yfield
+    }
     for (_ <- 0 to p) { // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
       val r1 = random.nextInt(xfield)
       val r2 = random.nextInt(yfield)
@@ -458,7 +505,9 @@ class Field {
     var vertical = "----"
     vertical = (vertical * yfield) + "-"
     for (i <- 0 until xfield) { // to -1
-      if (i > 0) { s += "|" }
+      if (i > 0) {
+        s += "|"
+      }
       s += "\n" + vertical + "\n"
       for (j <- 0 until yfield) { // to -1
         val thing: Thing = field(i)(j)

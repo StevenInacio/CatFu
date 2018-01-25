@@ -3,12 +3,13 @@ package de.htwg.se.CatFu
 
 import de.htwg.se.CatFu.logic._
 import de.htwg.se.CatFu.model._
+import de.htwg.se.CatFu.view.CatFuGUI
 
 import scala.io.StdIn.readLine
 
 object CatFu {
 
-  // val gui = new CatFuGUI()
+   val gui = new CatFuGUI()
 
   val obs1 = Obstacle()
   var counter: Int = 0
