@@ -2,9 +2,9 @@ package de.htwg.se.CatFu.model
 
 class Field {
   var stepsTaken = 0
-  val xfield: Int = 12
-  val yfield: Int = 12
-  var field: Array[Array[Thing]] = Array.ofDim[Thing](xfield, yfield)
+  val xField: Int = 12
+  val yField: Int = 12
+  var field: Array[Array[Thing]] = Array.ofDim[Thing](xField, yField)
   val empty = Empty("")
   val rock = Obstacle()
   clearField()
@@ -158,9 +158,9 @@ class Field {
     */
   def clearField(): Unit = {
     val empty = Empty(Console.WHITE)
-    field = Array.ofDim[Thing](xfield, yfield)
-    for (i <- 0 until xfield) {
-      for (j <- 0 until yfield) {
+    field = Array.ofDim[Thing](xField, yField)
+    for (i <- 0 until xField) {
+      for (j <- 0 until yField) {
         field(i)(j) = empty
       }
     }
@@ -201,11 +201,11 @@ class Field {
     var s: String = ""
     var vertical = "----"
     var block = true
-    vertical = (vertical * yfield) + "-"
+    vertical = (vertical * yField) + "-"
     s += "    "
-    for (i <- 0 until xfield) {
+    for (i <- 0 until xField) {
       if (block) {
-        for (k <- 0 until xfield) {
+        for (k <- 0 until xField) {
           if (k > 9) {
             s += " " + k + " "
           } else {
@@ -223,7 +223,7 @@ class Field {
       } else {
         s += "  " + i + " "
       }
-      for (j <- 0 until yfield) {
+      for (j <- 0 until yField) {
         val thing: Thing = field(i)(j)
         if (thing == empty) {
           s += "|   "
@@ -248,15 +248,15 @@ class Field {
   def setUpTeams(player: List[Player], enemy: List[Player]): Unit = {
     val random = new scala.util.Random
     for (s <- player) {
-      val x = random.nextInt(xfield / 3) + (2 * xfield) / 3
-      val y = random.nextInt(yfield)
+      val x = random.nextInt(xField / 3) + (2 * xField) / 3
+      val y = random.nextInt(yField)
       field(x)(y) = s
       s.posx = x
       s.posy = y
     }
     for (s <- enemy) {
-      val x = random.nextInt(xfield / 3)
-      val y = random.nextInt(yfield)
+      val x = random.nextInt(xField / 3)
+      val y = random.nextInt(yField)
       field(x)(y) = s
       s.posx = x
       s.posy = y
@@ -270,14 +270,14 @@ class Field {
   def setRandomObstacle(): Unit = {
     val random = new scala.util.Random
     var p = 0
-    if (yfield > xfield) {
-      p = xfield
+    if (yField > xField) {
+      p = xField
     } else {
-      p = yfield
+      p = yField
     }
     for (_ <- 0 to p) { // immer ein Hindernis mehr als der kleinere Wert der Matrixlänge
-      val r1 = random.nextInt(xfield)
-      val r2 = random.nextInt(yfield)
+      val r1 = random.nextInt(xField)
+      val r2 = random.nextInt(yField)
       field(r1)(r2) = rock
     }
   }
@@ -324,10 +324,10 @@ class Field {
   }
 
   def matchTestValidInputSpace(x: (Int, Int), i: Char): Boolean = i match {
-    case 'a' if (x._2 - 1 < yfield && x._2 - 1 >= 0) && field(x._1)(x._2 - 1).isInstanceOf[Empty] => true
-    case 'w' if (x._1 - 1 < xfield && x._1 - 1 >= 0) && field(x._1 - 1)(x._2).isInstanceOf[Empty] => true
-    case 's' if (x._1 + 1 < xfield && x._1 + 1 >= 0) && field(x._1 + 1)(x._2).isInstanceOf[Empty] => true
-    case 'd' if (x._2 + 1 < yfield && x._2 + 1 >= 0) && field(x._1)(x._2 + 1).isInstanceOf[Empty] => true
+    case 'a' if (x._2 - 1 < yField && x._2 - 1 >= 0) && field(x._1)(x._2 - 1).isInstanceOf[Empty] => true
+    case 'w' if (x._1 - 1 < xField && x._1 - 1 >= 0) && field(x._1 - 1)(x._2).isInstanceOf[Empty] => true
+    case 's' if (x._1 + 1 < xField && x._1 + 1 >= 0) && field(x._1 + 1)(x._2).isInstanceOf[Empty] => true
+    case 'd' if (x._2 + 1 < yField && x._2 + 1 >= 0) && field(x._1)(x._2 + 1).isInstanceOf[Empty] => true
     case _ => false
   }
 
@@ -336,10 +336,10 @@ class Field {
   }
 
   def matchTestIsInField(x: (Int, Int), i: Char): Boolean = i match {
-    case 'a' if x._2 - 1 < yfield && x._2 - 1 >= 0 => true
-    case 'w' if x._1 - 1 < xfield && x._1 - 1 >= 0 => true
-    case 's' if x._1 + 1 < xfield && x._1 + 1 >= 0 => true
-    case 'd' if x._2 + 1 < yfield && x._2 + 1 >= 0 => true
+    case 'a' if x._2 - 1 < yField && x._2 - 1 >= 0 => true
+    case 'w' if x._1 - 1 < xField && x._1 - 1 >= 0 => true
+    case 's' if x._1 + 1 < xField && x._1 + 1 >= 0 => true
+    case 'd' if x._2 + 1 < yField && x._2 + 1 >= 0 => true
     case _ => false
   }
 
@@ -498,10 +498,10 @@ class Field {
     val highlightColor = Console.BLUE_B
     var s: String = ""
     var vertical = "----"
-    vertical = (vertical * yfield) + "-"
-    for (i <- 0 until xfield) {
+    vertical = (vertical * yField) + "-"
+    for (i <- 0 until xField) {
       if (block) {
-        for (k <- 0 until xfield) {
+        for (k <- 0 until xField) {
           if (k > 9) {
             s += " " + k + " "
           } else {
@@ -519,7 +519,7 @@ class Field {
       } else {
         s += "  " + i + " "
       }
-      for (j <- 0 until yfield) {
+      for (j <- 0 until yField) {
         val thing: Thing = field(i)(j)
         if (list.contains((i, j))) {
           if (thing == empty) {

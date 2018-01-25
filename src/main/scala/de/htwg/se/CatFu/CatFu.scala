@@ -9,9 +9,7 @@ object CatFu {
   val gui: CatFuGUI.type = CatFuGUI
 
   def main(args: Array[String]): Unit = {
-    val p = new Mage("Name", Console.WHITE)
-   println( p.fullDescription
-   )// Controller.menu()
+   Controller.menu()
   }
 }
 

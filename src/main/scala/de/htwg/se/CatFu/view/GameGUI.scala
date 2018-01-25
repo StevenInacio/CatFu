@@ -43,18 +43,18 @@ class GameGUI extends Frame {
 
     }, BorderPanel.Position.South)
 
-    add(new GridPanel(board.xfield + 1, board.yfield + 1) {
+    add(new GridPanel(board.xField + 1, board.yField + 1) {
       var block = true
       contents += new Label("     ")
       for (i <- 0 until 12) {
         if (block) {
-          for (k <- 0 until board.xfield) {
+          for (k <- 0 until board.xField) {
             contents += new Label("  " + k + "  ")
           }
           block = false
         }
         contents += new Label("  " + i + "  ")
-        for (j <- 0 until board.yfield) {
+        for (j <- 0 until board.yField) {
           background = Color.green
           var butt = new Button()
           butt.background = Color.red

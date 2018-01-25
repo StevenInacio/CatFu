@@ -15,6 +15,7 @@ class ControllerSpec extends WordSpec with Matchers {
   var startingTeam: List[Player] = List()
   var enemyList: List[Player] = List()
   val player = new Mage("Your Name", Console.GREEN)
+  val player2 = new Warrior("Name", Console.GREEN)
   val x = 5
   val y = 5
   board.setPosition(player, x, y)
