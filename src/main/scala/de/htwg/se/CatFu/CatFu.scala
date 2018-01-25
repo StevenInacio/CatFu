@@ -9,7 +9,7 @@ import scala.io.StdIn.readLine
 
 object CatFu {
 
-   val gui = new CatFuGUI()
+  // val gui = new CatFuGUI()
 
   val obs1 = Obstacle()
   var counter: Int = 0
@@ -18,7 +18,7 @@ object CatFu {
   var enemyList: List[Player] = List()
 
   def main(args: Array[String]): Unit = {
-    menu()
+   menu()
   }
 
   def userinput(): String = {
